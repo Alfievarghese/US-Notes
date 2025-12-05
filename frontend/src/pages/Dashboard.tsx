@@ -7,6 +7,7 @@ import NoteCreator from '../components/NoteCreator';
 import FloatingElements from '../components/FloatingElements';
 import ProfilePopup from '../components/ProfilePopup';
 import ProfileSettings from '../components/ProfileSettings';
+import SharedDiary from '../components/SharedDiary';
 import { requestNotificationPermission, showNoteNotification } from '../utils/notifications';
 
 // Icons
@@ -346,59 +347,71 @@ const Dashboard: React.FC = () => {
                     </button>
                 </div>
 
-                {/* Notes Grid */}
+                {/* Content Based on Active Tab */}
                 <AnimatePresence mode='wait'>
-                    {isLoading ? (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="flex flex-col items-center gap-4 mt-10"
-                        >
-                            <div className="w-12 h-12 border-4 border-pink-300 border-t-pink-600 rounded-full animate-spin" />
-                            <p className="text-pink-700 font-medium animate-pulse">Loading {activeTab}...</p>
-                        </motion.div>
+                    {activeTab === 'notes' ? (
+                        isLoading ? (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="flex flex-col items-center gap-4 mt-10"
+                            >
+                                <div className="w-12 h-12 border-4 border-pink-300 border-t-pink-600 rounded-full animate-spin" />
+                                <p className="text-pink-700 font-medium animate-pulse">Loading notes...</p>
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="notes"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                className="w-full"
+                            >
+                                {notes.length === 0 ? (
+                                    <div className="text-center py-20 opacity-60">
+                                        <FiSmile size={60} className="mx-auto mb-4 text-pink-400" />
+                                        <p className="text-xl font-handwritten text-pink-800">No notes yet. Be the first to write one!</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full pb-20">
+                                        {notes.map((note, i) => {
+                                            const isOwn = note.senderId === user?.id;
+                                            return (
+                                                <StickyNote
+                                                    key={note.id}
+                                                    content={note.content}
+                                                    senderName={isOwn ? 'You' : note.sender?.displayName || 'Partner'}
+                                                    senderPicture={note.sender?.profilePicture}
+                                                    isOwn={isOwn}
+                                                    isPublished={note.isPublished}
+                                                    hasVoice={!!(note.voiceUrl || note.voiceMessage)}
+                                                    hasImage={!!(note.imageUrl || note.imageData)}
+                                                    imageData={note.imageUrl || note.imageData}
+                                                    voiceDuration={note.voiceDuration}
+                                                    timeUntilPublish={note.timeUntilPublish}
+                                                    daysUntilExpiry={note.daysUntilExpiry}
+                                                    onPublish={!note.isPublished && isOwn ? () => handlePublishNote(note.id) : undefined}
+                                                    onPlayVoice={() => {
+                                                        const audio = new Audio(note.voiceUrl || note.voiceMessage);
+                                                        audio.play();
+                                                    }}
+                                                    colorIndex={i}
+                                                />
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </motion.div>
+                        )
                     ) : (
                         <motion.div
-                            key={activeTab}
+                            key="diary"
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
                             className="w-full"
                         >
-                            {notes.length === 0 ? (
-                                <div className="text-center py-20 opacity-60">
-                                    <FiSmile size={60} className="mx-auto mb-4 text-pink-400" />
-                                    <p className="text-xl font-handwritten text-pink-800">No notes yet. Be the first to write one!</p>
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full pb-20">
-                                    {notes.map((note, i) => {
-                                        const isOwn = note.senderId === user?.id;
-                                        return (
-                                            <StickyNote
-                                                key={note.id}
-                                                content={note.content}
-                                                senderName={isOwn ? 'You' : note.sender?.displayName || 'Partner'}
-                                                senderPicture={note.sender?.profilePicture}
-                                                isOwn={isOwn}
-                                                isPublished={note.isPublished}
-                                                hasVoice={!!(note.voiceUrl || note.voiceMessage)}
-                                                hasImage={!!(note.imageUrl || note.imageData)}
-                                                imageData={note.imageUrl || note.imageData}
-                                                voiceDuration={note.voiceDuration}
-                                                timeUntilPublish={note.timeUntilPublish}
-                                                daysUntilExpiry={note.daysUntilExpiry}
-                                                onPublish={!note.isPublished && isOwn ? () => handlePublishNote(note.id) : undefined}
-                                                onPlayVoice={() => {
-                                                    const audio = new Audio(note.voiceUrl || note.voiceMessage);
-                                                    audio.play();
-                                                }}
-                                                colorIndex={i}
-                                            />
-                                        );
-                                    })}
-                                </div>
-                            )}
+                            <SharedDiary roomId={room?.id || ''} />
                         </motion.div>
                     )}
                 </AnimatePresence>

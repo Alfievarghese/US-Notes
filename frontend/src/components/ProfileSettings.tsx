@@ -66,12 +66,12 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClos
                         initial={{ opacity: 0, scale: 0.9, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg z-50"
+                        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg z-50 px-4"
                     >
-                        <div className="glass-card p-8 mx-4">
+                        <div className="glass-card p-4 sm:p-6 md:p-8">
                             {/* Header */}
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-3xl font-romantic text-gradient">Edit Profile</h2>
+                            <div className="flex items-center justify-between mb-4 sm:mb-6">
+                                <h2 className="text-2xl sm:text-3xl font-romantic text-gradient">Edit Profile</h2>
                                 <button
                                     onClick={onClose}
                                     className="p-2 hover:bg-pink-100 rounded-full transition-colors"
@@ -103,9 +103,9 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClos
                             </AnimatePresence>
 
                             {/* Profile Picture Upload */}
-                            <div className="flex flex-col items-center mb-6">
+                            <div className="flex flex-col items-center mb-4 sm:mb-6">
                                 <div className="relative group">
-                                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-pink-300 shadow-lg">
+                                    <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-pink-300 shadow-lg">
                                         {profilePicture ? (
                                             <img
                                                 src={profilePicture}
@@ -113,13 +113,13 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClos
                                                 className="w-full h-full object-cover"
                                             />
                                         ) : (
-                                            <div className="w-full h-full bg-gradient-to-br from-pink-400 to-rose-400 flex items-center justify-center text-white text-4xl">
+                                            <div className="w-full h-full bg-gradient-to-br from-pink-400 to-rose-400 flex items-center justify-center text-white text-3xl sm:text-4xl">
                                                 {displayName?.charAt(0) || user?.username?.charAt(0) || '?'}
                                             </div>
                                         )}
                                     </div>
                                     <label className="absolute bottom-0 right-0 p-2 bg-pink-500 rounded-full cursor-pointer hover:bg-pink-600 transition-colors shadow-lg">
-                                        <FiUpload className="text-white" size={20} />
+                                        <FiUpload className="text-white" size={18} />
                                         <input
                                             type="file"
                                             accept="image/*"
@@ -128,34 +128,34 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClos
                                         />
                                     </label>
                                 </div>
-                                <p className="text-xs text-gray-500 mt-2">Click camera icon to upload</p>
+                                <p className="text-xs text-gray-500 mt-2">Tap to upload photo</p>
                             </div>
 
                             {/* Display Name */}
-                            <div className="mb-4">
-                                <label className="flex items-center gap-2 text-pink-700 font-handwritten mb-2 text-lg">
-                                    <FiUser size={20} />
+                            <div className="mb-3 sm:mb-4">
+                                <label className="flex items-center gap-2 text-pink-700 font-handwritten mb-2 text-base sm:text-lg">
+                                    <FiUser size={18} />
                                     Display Name
                                 </label>
                                 <input
                                     type="text"
                                     value={displayName}
                                     onChange={(e) => setDisplayName(e.target.value)}
-                                    className="love-input w-full"
+                                    className="love-input w-full text-sm sm:text-base"
                                     placeholder="How your partner sees you"
                                 />
                             </div>
 
                             {/* Bio */}
-                            <div className="mb-6">
-                                <label className="flex items-center gap-2 text-pink-700 font-handwritten mb-2 text-lg">
-                                    <FiMessageSquare size={20} />
+                            <div className="mb-4 sm:mb-6">
+                                <label className="flex items-center gap-2 text-pink-700 font-handwritten mb-2 text-base sm:text-lg">
+                                    <FiMessageSquare size={18} />
                                     Bio
                                 </label>
                                 <textarea
                                     value={bio}
                                     onChange={(e) => setBio(e.target.value)}
-                                    className="love-input w-full h-24 resize-none"
+                                    className="love-input w-full h-20 sm:h-24 resize-none text-sm sm:text-base"
                                     placeholder="Tell your partner about yourself..."
                                     maxLength={200}
                                 />
@@ -163,7 +163,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ isOpen, onClos
                             </div>
 
                             {/* Buttons */}
-                            <div className="flex gap-3">
+                            <div className="flex flex-col sm:flex-row gap-3">
                                 <motion.button
                                     onClick={onClose}
                                     className="flex-1 py-3 bg-gray-200 hover:bg-gray-300 rounded-xl font-bold text-gray-700 transition-colors"
