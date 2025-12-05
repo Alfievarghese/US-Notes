@@ -19,7 +19,7 @@ app.use(cors({
     origin: process.env.FRONTEND_URL || '*',
     credentials: true
 }));
-app.use(express.json({ limit: '10mb' })); // Increased for voice messages
+app.use(express.json({ limit: '50mb' })); // Increased for high-res images and voice messages
 
 // Routes
 app.use('/api/auth', authRoutes);

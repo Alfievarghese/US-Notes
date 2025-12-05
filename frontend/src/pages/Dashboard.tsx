@@ -81,10 +81,15 @@ export const Dashboard: React.FC = () => {
             fetchNotes();
             fetchDiaries();
             // Poll every 10 seconds for real-time updates (like WhatsApp)
-            const interval = setInterval(() => { fetchNotes(); fetchDiaries(); }, 10000);
+            // Also refresh room info to sync partner's profile picture/bio changes
+            const interval = setInterval(() => {
+                fetchNotes();
+                fetchDiaries();
+                refreshRoomInfo();
+            }, 10000);
             return () => clearInterval(interval);
         }
-    }, [room, fetchNotes, fetchDiaries]);
+    }, [room, fetchNotes, fetchDiaries, refreshRoomInfo]);
 
     useEffect(() => {
         if (user) {
