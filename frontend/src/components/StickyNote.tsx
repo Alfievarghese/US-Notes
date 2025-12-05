@@ -1,0 +1,150 @@
+import React, { useMemo } from 'react';
+import { motion } from 'framer-motion';
+
+interface StickyNoteProps {
+    content: string;
+    senderName: string;
+    senderPicture?: string;
+    isOwn: boolean;
+    isPublished: boolean;
+    hasVoice?: boolean;
+    voiceMessage?: string;
+    voiceDuration?: number;
+    timeUntilPublish?: number | null;
+    timeUntilExpiry?: number | null;
+    onPublish?: () => void;
+    onPlayVoice?: () => void;
+    colorIndex?: number;
+}
+
+const COLORS = ['yellow', 'pink', 'blue', 'green', 'peach'] as const;
+
+const formatTime = (ms: number): string => {
+    if (ms <= 0) return 'Now';
+    const hours = Math.floor(ms / (1000 * 60 * 60));
+    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+    if (hours > 24) return `${Math.floor(hours / 24)}d ${hours % 24}h`;
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    return `${minutes}m`;
+};
+
+export const StickyNote: React.FC<StickyNoteProps> = ({
+    content,
+    senderName,
+    senderPicture,
+    isOwn,
+    isPublished,
+    hasVoice,
+    voiceMessage,
+    voiceDuration,
+    timeUntilPublish,
+    timeUntilExpiry,
+    onPublish,
+    onPlayVoice,
+    colorIndex = 0,
+}) => {
+    const rotation = useMemo(() => (Math.random() - 0.5) * 4, []);
+    const animationDelay = useMemo(() => Math.random() * 2, []);
+    const colorClass = COLORS[colorIndex % COLORS.length];
+
+    return (
+        <motion.div
+            className={`sticky-note ${colorClass} w-72 p-5`}
+            style={{ rotate: rotation }}
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{
+                opacity: 1,
+                scale: 1,
+                y: [0, -8, 0],
+            }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{
+                opacity: { duration: 0.3 },
+                scale: { duration: 0.3 },
+                y: { duration: 5 + animationDelay, repeat: Infinity, ease: "easeInOut", delay: animationDelay }
+            }}
+            whileHover={{ scale: 1.05, rotate: 0 }}
+        >
+            {/* Header */}
+            <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                    {senderPicture ? (
+                        <img src={senderPicture} alt="" className="w-8 h-8 rounded-full object-cover" />
+                    ) : (
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-red-400 flex items-center justify-center text-white text-sm">
+                            {senderName.charAt(0)}
+                        </div>
+                    )}
+                    <span className="text-sm font-semibold text-gray-600">
+                        {isOwn ? 'You' : senderName}
+                    </span>
+                </div>
+
+                {!isPublished && isOwn && (
+                    <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+                        ⏳ Pending
+                    </span>
+                )}
+                {isPublished && (
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                        ❤️ Sent
+                    </span>
+                )}
+            </div>
+
+            {/* Content */}
+            {content && (
+                <p className="font-handwritten text-lg text-gray-800 leading-relaxed mb-3">
+                    {content}
+                </p>
+            )}
+
+            {/* Voice message */}
+            {hasVoice && (
+                <motion.button
+                    onClick={onPlayVoice}
+                    className="w-full p-3 bg-gradient-to-r from-pink-100 to-red-100 rounded-lg flex items-center gap-3 group"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                >
+                    <span className="text-2xl">🎵</span>
+                    <div className="flex-1 text-left">
+                        <p className="text-sm text-gray-600">Voice Message</p>
+                        <p className="text-xs text-gray-400">{voiceDuration ? `${Math.round(voiceDuration)}s` : 'Tap to play'}</p>
+                    </div>
+                    <span className="text-xl group-hover:scale-110 transition-transform">▶️</span>
+                </motion.button>
+            )}
+
+            {/* Timer */}
+            <div className="mt-3 text-xs text-gray-500 space-y-1">
+                {!isPublished && timeUntilPublish != null && (
+                    <div className="flex justify-between">
+                        <span>Auto-publish:</span>
+                        <span className="font-semibold text-amber-600">{formatTime(timeUntilPublish)}</span>
+                    </div>
+                )}
+                {isPublished && timeUntilExpiry != null && (
+                    <div className="flex justify-between">
+                        <span>Expires:</span>
+                        <span className="font-semibold text-pink-600">{formatTime(timeUntilExpiry)}</span>
+                    </div>
+                )}
+            </div>
+
+            {/* Publish button */}
+            {!isPublished && isOwn && onPublish && (
+                <motion.button
+                    onClick={onPublish}
+                    className="mt-3 w-full py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white text-sm font-bold rounded-lg"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                >
+                    💌 Send Now
+                </motion.button>
+            )}
+        </motion.div>
+    );
+};
+
+export default StickyNote;

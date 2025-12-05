@@ -1,0 +1,321 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Dancing+Script:wght@400;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Kalam', cursive;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background-attachment: fixed;
+  color: #fff;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #e94560, #ff6b6b);
+  border-radius: 10px;
+}
+
+/* Sticky note paper texture */
+.sticky-note {
+  position: relative;
+  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+  border-radius: 4px;
+  box-shadow:
+    4px 4px 15px rgba(0, 0, 0, 0.3),
+    0 0 4px rgba(0, 0, 0, 0.1),
+    inset 0 0 80px rgba(0, 0, 0, 0.03);
+  color: #333;
+}
+
+.sticky-note::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(0deg,
+      transparent,
+      transparent 24px,
+      rgba(0, 0, 0, 0.03) 24px,
+      rgba(0, 0, 0, 0.03) 25px);
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+.sticky-note.pink {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+}
+
+.sticky-note.blue {
+  background: linear-gradient(135deg, #e3f2fd 0%, #b3e5fc 100%);
+}
+
+.sticky-note.green {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+}
+
+.sticky-note.peach {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+}
+
+/* Floating butterflies */
+.butterfly {
+  position: fixed;
+  font-size: 24px;
+  opacity: 0.6;
+  animation: flutter 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes flutter {
+
+  0%,
+  100% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+  }
+
+  25% {
+    transform: translateY(-30px) translateX(20px) rotate(10deg);
+  }
+
+  50% {
+    transform: translateY(-10px) translateX(-15px) rotate(-5deg);
+  }
+
+  75% {
+    transform: translateY(-40px) translateX(10px) rotate(8deg);
+  }
+}
+
+/* Floating hearts background */
+.floating-hearts {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.heart {
+  position: absolute;
+  opacity: 0.15;
+  animation: floatUp 20s linear infinite;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 0.15;
+  }
+
+  90% {
+    opacity: 0.15;
+  }
+
+  100% {
+    transform: translateY(-100px) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* Glow effect */
+.glow {
+  animation: glow 3s ease-in-out infinite;
+}
+
+@keyframes glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(233, 69, 96, 0.3), 0 0 20px rgba(233, 69, 96, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 25px rgba(233, 69, 96, 0.5), 0 0 40px rgba(233, 69, 96, 0.3);
+  }
+}
+
+/* Glass card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+}
+
+/* Red heart button */
+.love-button {
+  @apply px-6 py-3 rounded-xl font-handwritten text-lg font-bold;
+  background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+}
+
+.love-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(233, 69, 96, 0.5);
+}
+
+.love-button:active {
+  transform: translateY(0);
+}
+
+.love-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.love-button-secondary {
+  @apply px-6 py-3 rounded-xl font-handwritten text-lg font-bold;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(233, 69, 96, 0.5);
+  color: #ff6b6b;
+  transition: all 0.3s ease;
+}
+
+.love-button-secondary:hover {
+  background: rgba(233, 69, 96, 0.1);
+  border-color: #e94560;
+}
+
+/* Input styling */
+.love-input {
+  @apply w-full px-4 py-3 rounded-xl;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-family: 'Kalam', cursive;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+.love-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.love-input:focus {
+  outline: none;
+  border-color: #e94560;
+  box-shadow: 0 0 20px rgba(233, 69, 96, 0.3);
+}
+
+/* Text gradient */
+.text-gradient {
+  background: linear-gradient(135deg, #e94560, #ff6b6b, #ff8e8e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Navbar */
+.navbar {
+  background: rgba(26, 26, 46, 0.8);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Room code styling */
+.room-code {
+  font-family: monospace;
+  letter-spacing: 0.3em;
+  font-size: 2rem;
+  font-weight: bold;
+  background: linear-gradient(135deg, #e94560, #ff6b6b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Voice recorder */
+.voice-recorder {
+  background: linear-gradient(135deg, rgba(233, 69, 96, 0.2), rgba(255, 107, 107, 0.2));
+  border: 2px solid rgba(233, 69, 96, 0.3);
+  border-radius: 20px;
+}
+
+.recording-pulse {
+  animation: recordPulse 1s ease-in-out infinite;
+}
+
+@keyframes recordPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(233, 69, 96, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 0 15px rgba(233, 69, 96, 0);
+  }
+}
+
+/* Profile picture */
+.profile-pic {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid #e94560;
+  object-fit: cover;
+  background: linear-gradient(135deg, #e94560, #ff6b6b);
+}
+
+/* Tab styling */
+.tab-active {
+  background: linear-gradient(135deg, #e94560, #ff6b6b);
+  color: white;
+}
+
+/* Animation classes */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Utility */
+.font-handwritten {
+  font-family: 'Kalam', cursive;
+}
+
+.font-romantic {
+  font-family: 'Dancing Script', cursive;
+}
