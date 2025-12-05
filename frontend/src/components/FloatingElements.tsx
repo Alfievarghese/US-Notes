@@ -10,15 +10,14 @@ interface FloatingElementsProps {
 const generateStableElements = (count: number, seed: number) => {
     const elements = [];
     for (let i = 0; i < count; i++) {
-        // Use deterministic pseudo-random based on index
         const hash = (seed * (i + 1) * 9301 + 49297) % 233280;
         elements.push({
             id: `${seed}-${i}`,
-            left: (hash % 100),
-            top: (hash % 80),
-            size: 20 + (hash % 24),
+            left: (hash % 90) + 5,
+            top: (hash % 70) + 10,
+            size: 20 + (hash % 20),
             delay: (hash % 200) / 10,
-            duration: 15 + (hash % 15),
+            duration: 8 + (hash % 8),
             animationType: hash % 3,
         });
     }
@@ -33,81 +32,83 @@ export const FloatingElements: React.FC<FloatingElementsProps> = ({
     const butterflies = useMemo(() => generateStableElements(butterflyCount, 5678), [butterflyCount]);
 
     return (
-        <>
-            {/* Floating Hearts - Draggable */}
-            <div className="floating-hearts" aria-hidden="true">
-                {hearts.map((heart) => (
-                    <motion.div
-                        key={heart.id}
-                        drag
-                        dragMomentum={false}
-                        dragElastic={0.1}
-                        whileHover={{ scale: 1.3, rotate: 15, cursor: 'grab' }}
-                        whileTap={{ scale: 1.1, cursor: 'grabbing' }}
-                        style={{
-                            position: 'absolute',
-                            left: `${heart.left}%`,
-                            top: `${heart.top}%`,
-                            fontSize: `${heart.size}px`,
-                            zIndex: 1,
-                            userSelect: 'none',
-                        }}
-                        animate={{
-                            y: [0, -30, 0],
-                            x: [0, Math.sin(heart.id.length) * 20, 0],
-                            rotate: [0, 10, -10, 0],
-                        }}
-                        transition={{
-                            duration: heart.duration,
-                            delay: heart.delay,
-                            repeat: Infinity,
-                            ease: "easeInOut"
-                        }}
-                    >
-                        ❤️
-                    </motion.div>
-                ))}
-            </div>
+        <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: 0 }}>
+            {/* Floating Hearts - Draggable with continuous animation */}
+            {hearts.map((heart) => (
+                <motion.div
+                    key={heart.id}
+                    drag
+                    dragMomentum={false}
+                    dragElastic={0.2}
+                    dragConstraints={{ left: -100, right: 100, top: -100, bottom: 100 }}
+                    whileHover={{ scale: 1.3, rotate: 15 }}
+                    whileTap={{ scale: 1.1 }}
+                    className="pointer-events-auto cursor-grab active:cursor-grabbing"
+                    style={{
+                        position: 'absolute',
+                        left: `${heart.left}%`,
+                        top: `${heart.top}%`,
+                        fontSize: `${heart.size}px`,
+                        userSelect: 'none',
+                        willChange: 'transform',
+                    }}
+                    animate={{
+                        y: [0, -20, 0, -15, 0],
+                        x: [0, 10, -10, 5, 0],
+                        rotate: [0, 5, -5, 3, 0],
+                    }}
+                    transition={{
+                        duration: heart.duration,
+                        delay: heart.delay,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        repeatType: "loop"
+                    }}
+                >
+                    ❤️
+                </motion.div>
+            ))}
 
-            {/* Butterflies - Draggable */}
+            {/* Butterflies - Draggable with flutter animation */}
             {butterflies.map((butterfly) => (
                 <motion.div
                     key={butterfly.id}
                     drag
                     dragMomentum={false}
-                    dragElastic={0.15}
+                    dragElastic={0.2}
+                    dragConstraints={{ left: -100, right: 100, top: -100, bottom: 100 }}
                     whileHover={{
                         scale: 1.4,
-                        rotate: [0, -10, 10, -10, 0],
-                        cursor: 'grab',
-                        transition: { duration: 0.3 }
+                        rotate: [0, -10, 10, -10, 10, 0],
+                        transition: { duration: 0.5, repeat: 3 }
                     }}
-                    whileTap={{ scale: 1.2, cursor: 'grabbing' }}
+                    whileTap={{ scale: 1.2 }}
+                    className="pointer-events-auto cursor-grab active:cursor-grabbing"
                     style={{
                         position: 'absolute',
                         left: `${butterfly.left}%`,
                         top: `${butterfly.top}%`,
                         fontSize: `${butterfly.size}px`,
-                        zIndex: 1,
                         userSelect: 'none',
+                        willChange: 'transform',
                     }}
                     animate={{
-                        x: [0, 40, -30, 40, 0],
-                        y: [0, -25, -15, -30, 0],
-                        rotate: [0, 5, -5, 3, -3, 0],
+                        x: [0, 30, -20, 30, 0],
+                        y: [0, -15, -25, -10, 0],
+                        rotate: [0, 8, -8, 5, -5, 0],
                     }}
                     transition={{
                         duration: butterfly.duration,
                         delay: butterfly.delay,
                         repeat: Infinity,
-                        ease: "easeInOut"
+                        ease: "easeInOut",
+                        repeatType: "loop"
                     }}
-                    aria-hidden="true"
                 >
                     🦋
                 </motion.div>
             ))}
-        </>
+        </div>
     );
 };
 
