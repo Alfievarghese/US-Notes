@@ -49,7 +49,6 @@ const Dashboard: React.FC = () => {
         const minutes = Math.floor((duration / (1000 * 60)) % 60);
         return `${hours}h ${minutes}m`;
     };
-
     // processNotePublishStatus Logic
     const processNotePublishStatus = (note: Note): Note => {
         const created = new Date(note.createdAt).getTime();
