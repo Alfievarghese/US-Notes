@@ -15,9 +15,9 @@ const generateStableElements = (count: number, seed: number) => {
             id: `${seed}-${i}`,
             left: (hash % 90) + 5,
             top: (hash % 70) + 10,
-            size: 20 + (hash % 20),
+            size: 20 + (hash % 16),
             delay: (hash % 200) / 10,
-            duration: 8 + (hash % 8),
+            duration: 12 + (hash % 10),
             animationType: hash % 3,
         });
     }
@@ -25,8 +25,8 @@ const generateStableElements = (count: number, seed: number) => {
 };
 
 export const FloatingElements: React.FC<FloatingElementsProps> = ({
-    heartCount = 10,
-    butterflyCount = 8
+    heartCount = 6,
+    butterflyCount = 5
 }) => {
     const hearts = useMemo(() => generateStableElements(heartCount, 1234), [heartCount]);
     const butterflies = useMemo(() => generateStableElements(butterflyCount, 5678), [butterflyCount]);
@@ -53,9 +53,9 @@ export const FloatingElements: React.FC<FloatingElementsProps> = ({
                         willChange: 'transform',
                     }}
                     animate={{
-                        y: [0, -20, 0, -15, 0],
-                        x: [0, 10, -10, 5, 0],
-                        rotate: [0, 5, -5, 3, 0],
+                        y: [0, -12, 0, -8, 0],
+                        x: [0, 6, -6, 3, 0],
+                        rotate: [0, 3, -3, 2, 0],
                     }}
                     transition={{
                         duration: heart.duration,
@@ -93,9 +93,9 @@ export const FloatingElements: React.FC<FloatingElementsProps> = ({
                         willChange: 'transform',
                     }}
                     animate={{
-                        x: index % 2 === 0 ? [0, 40, -30, 40, 0] : [0, -35, 25, -35, 0],
-                        y: index % 3 === 0 ? [0, -20, -30, -15, 0] : [0, -25, -10, -25, 0],
-                        rotate: index % 2 === 0 ? [0, 8, -8, 5, -5, 0] : [0, -6, 6, -4, 4, 0],
+                        x: index % 2 === 0 ? [0, 20, -15, 20, 0] : [0, -18, 12, -18, 0],
+                        y: index % 3 === 0 ? [0, -10, -15, -8, 0] : [0, -12, -6, -12, 0],
+                        rotate: index % 2 === 0 ? [0, 4, -4, 3, -3, 0] : [0, -3, 3, -2, 2, 0],
                     }}
                     transition={{
                         duration: butterfly.duration,
