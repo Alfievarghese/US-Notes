@@ -32,7 +32,7 @@ export const FloatingElements: React.FC<FloatingElementsProps> = ({
     const butterflies = useMemo(() => generateStableElements(butterflyCount, 5678), [butterflyCount]);
 
     return (
-        <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: 0 }}>
+        <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: 40 }}>
             {/* Floating Hearts - Draggable with continuous animation */}
             {hearts.map((heart) => (
                 <motion.div
@@ -69,8 +69,8 @@ export const FloatingElements: React.FC<FloatingElementsProps> = ({
                 </motion.div>
             ))}
 
-            {/* Butterflies - Draggable with flutter animation */}
-            {butterflies.map((butterfly) => (
+            {/* Butterflies - Draggable with flutter animation - On top layer */}
+            {butterflies.map((butterfly, index) => (
                 <motion.div
                     key={butterfly.id}
                     drag
@@ -93,9 +93,9 @@ export const FloatingElements: React.FC<FloatingElementsProps> = ({
                         willChange: 'transform',
                     }}
                     animate={{
-                        x: [0, 30, -20, 30, 0],
-                        y: [0, -15, -25, -10, 0],
-                        rotate: [0, 8, -8, 5, -5, 0],
+                        x: index % 2 === 0 ? [0, 40, -30, 40, 0] : [0, -35, 25, -35, 0],
+                        y: index % 3 === 0 ? [0, -20, -30, -15, 0] : [0, -25, -10, -25, 0],
+                        rotate: index % 2 === 0 ? [0, 8, -8, 5, -5, 0] : [0, -6, 6, -4, 4, 0],
                     }}
                     transition={{
                         duration: butterfly.duration,
