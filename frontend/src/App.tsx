@@ -5,24 +5,6 @@ import { Login } from './pages/Login';
 import { RoomSetup } from './pages/RoomSetup';
 import { Dashboard } from './pages/Dashboard';
 
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { user, isLoading } = useAuth();
-
-    if (isLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <span className="text-7xl animate-pulse">❤️</span>
-                    <p className="font-handwritten text-xl text-pink-400 mt-4">Loading...</p>
-                </div>
-            </div>
-        );
-    }
-
-    if (!user) return <Navigate to="/login" replace />;
-    return <>{children}</>;
-};
-
 const RoomRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { user, room, isLoading } = useAuth();
 

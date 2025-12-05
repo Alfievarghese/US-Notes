@@ -219,7 +219,6 @@ export const Dashboard: React.FC = () => {
                                                     isOwn={false}
                                                     isPublished={note.isPublished}
                                                     hasVoice={note.hasVoice}
-                                                    voiceMessage={note.voiceMessage}
                                                     voiceDuration={note.voiceDuration}
                                                     timeUntilExpiry={note.timeUntilExpiry}
                                                     onPlayVoice={() => note.voiceMessage && playVoice(note.voiceMessage)}
@@ -242,7 +241,6 @@ export const Dashboard: React.FC = () => {
                                                     isOwn={true}
                                                     isPublished={note.isPublished}
                                                     hasVoice={note.hasVoice}
-                                                    voiceMessage={note.voiceMessage}
                                                     voiceDuration={note.voiceDuration}
                                                     timeUntilPublish={note.timeUntilPublish}
                                                     timeUntilExpiry={note.timeUntilExpiry}
