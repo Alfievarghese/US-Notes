@@ -70,10 +70,6 @@ interface ToastItem {
     type: 'success' | 'error' | 'info';
 }
 
-interface ToastContextType {
-    showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
-}
-
 export const useToastState = () => {
     const [toasts, setToasts] = useState<ToastItem[]>([]);
 
