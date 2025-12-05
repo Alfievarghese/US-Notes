@@ -21,12 +21,9 @@ export const requestNotificationPermission = async (): Promise<boolean> => {
 export const showNotification = (title: string, options?: NotificationOptions) => {
     if (Notification.permission === 'granted') {
         const notification = new Notification(title, {
-            icon: '/heart-icon.png', // You can add a heart icon to public folder
+            icon: '/heart-icon.png',
             badge: '/heart-icon.png',
-            vibrate: [200, 100, 200],
             tag: 'us-notes',
-            renotify: true,
-            requireInteraction: false,
             ...options
         });
 
