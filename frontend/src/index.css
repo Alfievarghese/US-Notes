@@ -2,7 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Dancing+Script:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Pacifico&display=swap');
+
+:root {
+  --pink-50: #fdf2f8;
+  --pink-100: #fce7f3;
+  --pink-200: #fbcfe8;
+  --pink-300: #f9a8d4;
+  --pink-400: #f472b6;
+  --pink-500: #ec4899;
+  --pink-600: #db2777;
+  --rose-300: #fda4af;
+  --rose-400: #fb7185;
+  --rose-500: #f43f5e;
+  --peach-100: #fff5eb;
+  --peach-200: #ffe4cc;
+  --cream: #fffbf7;
+}
 
 * {
   margin: 0;
@@ -10,39 +26,87 @@
   box-sizing: border-box;
 }
 
-body {
-  font-family: 'Kalam', cursive;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  background-attachment: fixed;
-  color: #fff;
+html {
+  scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
+body {
+  font-family: 'Quicksand', sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg,
+      #fdf2f8 0%,
+      #fce7f3 25%,
+      #fbcfe8 50%,
+      #fce7f3 75%,
+      #fdf2f8 100%);
+  background-attachment: fixed;
+  color: #831843;
+  overflow-x: hidden;
+}
+
+/* Animated background gradient */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(ellipse at 20% 30%, rgba(251, 207, 232, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, rgba(249, 168, 212, 0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(253, 164, 175, 0.2) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+  animation: gradientShift 15s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Custom scrollbar - pink theme */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(251, 207, 232, 0.3);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #e94560, #ff6b6b);
+  background: linear-gradient(180deg, var(--pink-400), var(--rose-400));
   border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
 }
 
-/* Sticky note paper texture */
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--pink-500), var(--rose-500));
+}
+
+/* ============================================
+   STICKY NOTES - Soft pastel colors
+   ============================================ */
 .sticky-note {
   position: relative;
-  background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
-  border-radius: 4px;
+  background: linear-gradient(145deg, #fffbf5 0%, #fff9f0 100%);
+  border-radius: 8px;
   box-shadow:
-    4px 4px 15px rgba(0, 0, 0, 0.3),
-    0 0 4px rgba(0, 0, 0, 0.1),
-    inset 0 0 80px rgba(0, 0, 0, 0.03);
-  color: #333;
+    0 10px 30px rgba(219, 39, 119, 0.15),
+    0 5px 15px rgba(0, 0, 0, 0.08),
+    inset 0 -3px 10px rgba(251, 207, 232, 0.3);
+  color: #6b2149;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow: hidden;
 }
 
 .sticky-note::before {
@@ -51,63 +115,93 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: repeating-linear-gradient(0deg,
-      transparent,
-      transparent 24px,
-      rgba(0, 0, 0, 0.03) 24px,
-      rgba(0, 0, 0, 0.03) 25px);
-  pointer-events: none;
-  border-radius: 4px;
+  height: 6px;
+  background: linear-gradient(90deg, var(--pink-300), var(--rose-300), var(--pink-400));
+  border-radius: 8px 8px 0 0;
+}
+
+.sticky-note:hover {
+  transform: translateY(-5px) rotate(0deg) !important;
+  box-shadow:
+    0 20px 40px rgba(219, 39, 119, 0.2),
+    0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.sticky-note.yellow {
+  background: linear-gradient(145deg, #fffde7 0%, #fff9c4 100%);
+}
+
+.sticky-note.yellow::before {
+  background: linear-gradient(90deg, #ffd54f, #ffb300, #ffc107);
 }
 
 .sticky-note.pink {
-  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+  background: linear-gradient(145deg, #fff0f5 0%, #ffe4ec 100%);
+}
+
+.sticky-note.pink::before {
+  background: linear-gradient(90deg, var(--pink-300), var(--pink-400), var(--rose-400));
 }
 
 .sticky-note.blue {
-  background: linear-gradient(135deg, #e3f2fd 0%, #b3e5fc 100%);
+  background: linear-gradient(145deg, #e8f4fd 0%, #d6eaf8 100%);
+}
+
+.sticky-note.blue::before {
+  background: linear-gradient(90deg, #81d4fa, #4fc3f7, #29b6f6);
 }
 
 .sticky-note.green {
-  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  background: linear-gradient(145deg, #e8f5e9 0%, #c8e6c9 100%);
+}
+
+.sticky-note.green::before {
+  background: linear-gradient(90deg, #81c784, #66bb6a, #4caf50);
 }
 
 .sticky-note.peach {
-  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  background: linear-gradient(145deg, #fff8f0 0%, #ffe8d6 100%);
 }
 
-/* Floating butterflies */
+.sticky-note.peach::before {
+  background: linear-gradient(90deg, #ffab91, #ff8a65, #ff7043);
+}
+
+/* ============================================
+   FLOATING ELEMENTS - Hearts & Butterflies
+   ============================================ */
 .butterfly {
   position: fixed;
-  font-size: 24px;
-  opacity: 0.6;
-  animation: flutter 8s ease-in-out infinite;
+  font-size: 28px;
+  opacity: 0.7;
+  animation: butterflyFly 12s ease-in-out infinite;
   pointer-events: none;
   z-index: 1;
+  filter: drop-shadow(0 2px 4px rgba(219, 39, 119, 0.2));
 }
 
-@keyframes flutter {
-
-  0%,
-  100% {
-    transform: translateY(0) translateX(0) rotate(0deg);
+@keyframes butterflyFly {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
   }
 
   25% {
-    transform: translateY(-30px) translateX(20px) rotate(10deg);
+    transform: translateY(-40px) translateX(30px) rotate(15deg) scale(1.1);
   }
 
   50% {
-    transform: translateY(-10px) translateX(-15px) rotate(-5deg);
+    transform: translateY(-20px) translateX(-20px) rotate(-10deg) scale(1);
   }
 
   75% {
-    transform: translateY(-40px) translateX(10px) rotate(8deg);
+    transform: translateY(-50px) translateX(15px) rotate(12deg) scale(1.05);
+  }
+
+  100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
   }
 }
 
-/* Floating hearts background */
 .floating-hearts {
   position: fixed;
   top: 0;
@@ -121,182 +215,275 @@ body {
 
 .heart {
   position: absolute;
-  opacity: 0.15;
-  animation: floatUp 20s linear infinite;
+  opacity: 0.25;
+  animation: floatUp 18s linear infinite;
+  filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.3));
 }
 
 @keyframes floatUp {
   0% {
-    transform: translateY(100vh) rotate(0deg);
+    transform: translateY(100vh) rotate(0deg) scale(0.8);
     opacity: 0;
   }
 
   10% {
-    opacity: 0.15;
+    opacity: 0.25;
+  }
+
+  50% {
+    transform: translateY(50vh) rotate(180deg) scale(1);
   }
 
   90% {
-    opacity: 0.15;
+    opacity: 0.25;
   }
 
   100% {
-    transform: translateY(-100px) rotate(720deg);
+    transform: translateY(-100px) rotate(360deg) scale(0.8);
     opacity: 0;
   }
 }
 
-/* Glow effect */
-.glow {
-  animation: glow 3s ease-in-out infinite;
-}
-
-@keyframes glow {
-
-  0%,
-  100% {
-    box-shadow: 0 0 10px rgba(233, 69, 96, 0.3), 0 0 20px rgba(233, 69, 96, 0.2);
-  }
-
-  50% {
-    box-shadow: 0 0 25px rgba(233, 69, 96, 0.5), 0 0 40px rgba(233, 69, 96, 0.3);
-  }
-}
-
-/* Glass card */
+/* ============================================
+   GLASS CARDS - Soft pink glassmorphism
+   ============================================ */
 .glass-card {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(251, 207, 232, 0.6);
+  border-radius: 24px;
+  box-shadow:
+    0 8px 32px rgba(219, 39, 119, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
 }
 
-/* Red heart button */
+.glass-card:hover {
+  box-shadow:
+    0 12px 40px rgba(219, 39, 119, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   BUTTONS - Rounded, soft, inviting
+   ============================================ */
 .love-button {
-  @apply px-6 py-3 rounded-xl font-handwritten text-lg font-bold;
-  background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
+  @apply px-8 py-4 rounded-2xl font-semibold text-lg;
+  background: linear-gradient(135deg, var(--pink-400) 0%, var(--rose-400) 50%, var(--pink-500) 100%);
+  background-size: 200% 200%;
   color: white;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow:
+    0 6px 20px rgba(236, 72, 153, 0.35),
+    0 3px 10px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.love-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
 }
 
 .love-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(233, 69, 96, 0.5);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    0 10px 30px rgba(236, 72, 153, 0.45),
+    0 5px 15px rgba(0, 0, 0, 0.12);
+  background-position: 100% 0;
+}
+
+.love-button:hover::before {
+  left: 100%;
 }
 
 .love-button:active {
-  transform: translateY(0);
+  transform: translateY(-1px) scale(1);
 }
 
 .love-button:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.2);
 }
 
 .love-button-secondary {
-  @apply px-6 py-3 rounded-xl font-handwritten text-lg font-bold;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(233, 69, 96, 0.5);
-  color: #ff6b6b;
+  @apply px-8 py-4 rounded-2xl font-semibold text-lg;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid var(--pink-300);
+  color: var(--pink-500);
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .love-button-secondary:hover {
-  background: rgba(233, 69, 96, 0.1);
-  border-color: #e94560;
+  background: rgba(251, 207, 232, 0.3);
+  border-color: var(--pink-400);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(236, 72, 153, 0.2);
 }
 
-/* Input styling */
+/* ============================================
+   INPUTS - Soft, warm, inviting
+   ============================================ */
 .love-input {
-  @apply w-full px-4 py-3 rounded-xl;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  font-family: 'Kalam', cursive;
+  @apply w-full px-5 py-4 rounded-2xl;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid var(--pink-200);
+  color: #6b2149;
+  font-family: 'Quicksand', sans-serif;
   font-size: 1.1rem;
+  font-weight: 500;
   transition: all 0.3s ease;
+  box-shadow: inset 0 2px 4px rgba(251, 207, 232, 0.2);
 }
 
 .love-input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(107, 33, 73, 0.4);
 }
 
 .love-input:focus {
   outline: none;
-  border-color: #e94560;
-  box-shadow: 0 0 20px rgba(233, 69, 96, 0.3);
+  border-color: var(--pink-400);
+  box-shadow:
+    0 0 0 4px rgba(244, 114, 182, 0.15),
+    inset 0 2px 4px rgba(251, 207, 232, 0.3);
+  background: white;
 }
 
-/* Text gradient */
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
 .text-gradient {
-  background: linear-gradient(135deg, #e94560, #ff6b6b, #ff8e8e);
+  background: linear-gradient(135deg, var(--pink-500), var(--rose-400), var(--pink-400));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Navbar */
+.font-handwritten {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 600;
+}
+
+.font-romantic {
+  font-family: 'Dancing Script', cursive;
+  font-weight: 600;
+}
+
+.font-logo {
+  font-family: 'Pacifico', cursive;
+}
+
+/* ============================================
+   NAVBAR - Clean, airy
+   ============================================ */
 .navbar {
-  background: rgba(26, 26, 46, 0.8);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(251, 207, 232, 0.5);
+  box-shadow: 0 2px 20px rgba(219, 39, 119, 0.08);
 }
 
-/* Room code styling */
+/* ============================================
+   ROOM CODE - Pretty and prominent
+   ============================================ */
 .room-code {
-  font-family: monospace;
-  letter-spacing: 0.3em;
-  font-size: 2rem;
-  font-weight: bold;
-  background: linear-gradient(135deg, #e94560, #ff6b6b);
+  font-family: 'Quicksand', sans-serif;
+  letter-spacing: 0.4em;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--pink-500), var(--rose-400));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  text-shadow: 0 2px 10px rgba(236, 72, 153, 0.2);
 }
 
-/* Voice recorder */
+/* ============================================
+   VOICE RECORDER
+   ============================================ */
 .voice-recorder {
-  background: linear-gradient(135deg, rgba(233, 69, 96, 0.2), rgba(255, 107, 107, 0.2));
-  border: 2px solid rgba(233, 69, 96, 0.3);
+  background: linear-gradient(135deg, rgba(251, 207, 232, 0.4), rgba(253, 164, 175, 0.3));
+  border: 2px solid rgba(244, 114, 182, 0.4);
   border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.voice-recorder:hover {
+  border-color: rgba(244, 114, 182, 0.6);
+  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.15);
 }
 
 .recording-pulse {
-  animation: recordPulse 1s ease-in-out infinite;
+  animation: recordPulse 1.5s ease-in-out infinite;
 }
 
 @keyframes recordPulse {
 
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(233, 69, 96, 0.4);
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.5);
+    transform: scale(1);
   }
 
   50% {
-    box-shadow: 0 0 0 15px rgba(233, 69, 96, 0);
+    box-shadow: 0 0 0 20px rgba(244, 63, 94, 0);
+    transform: scale(1.05);
   }
 }
 
-/* Profile picture */
+/* ============================================
+   TABS - Rounded, pill-style
+   ============================================ */
+.tab-active {
+  background: linear-gradient(135deg, var(--pink-400), var(--rose-400));
+  color: white;
+  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+}
+
+/* ============================================
+   PROFILE & AVATARS
+   ============================================ */
 .profile-pic {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  border: 3px solid #e94560;
+  border: 4px solid white;
+  box-shadow:
+    0 0 0 4px var(--pink-300),
+    0 4px 15px rgba(236, 72, 153, 0.25);
   object-fit: cover;
-  background: linear-gradient(135deg, #e94560, #ff6b6b);
+  transition: all 0.3s ease;
 }
 
-/* Tab styling */
-.tab-active {
-  background: linear-gradient(135deg, #e94560, #ff6b6b);
-  color: white;
+.profile-pic:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 0 4px var(--pink-400),
+    0 6px 20px rgba(236, 72, 153, 0.35);
 }
 
-/* Animation classes */
+/* ============================================
+   ANIMATIONS
+   ============================================ */
 .animate-float {
-  animation: float 6s ease-in-out infinite;
+  animation: float 5s ease-in-out infinite;
 }
 
 @keyframes float {
@@ -307,15 +494,152 @@ body {
   }
 
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-12px);
   }
 }
 
-/* Utility */
-.font-handwritten {
-  font-family: 'Kalam', cursive;
+.glow {
+  animation: glow 3s ease-in-out infinite;
 }
 
-.font-romantic {
-  font-family: 'Dancing Script', cursive;
+@keyframes glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 15px rgba(244, 114, 182, 0.4), 0 0 30px rgba(244, 114, 182, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 25px rgba(244, 114, 182, 0.6), 0 0 50px rgba(244, 114, 182, 0.3);
+  }
+}
+
+/* Page enter animation */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeSlideUp 0.6s ease-out forwards;
+}
+
+/* Shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.5) 50%,
+      rgba(255, 255, 255, 0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Heartbeat animation for love-related elements */
+@keyframes heartbeat {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  15% {
+    transform: scale(1.15);
+  }
+
+  30% {
+    transform: scale(1);
+  }
+
+  45% {
+    transform: scale(1.1);
+  }
+
+  60% {
+    transform: scale(1);
+  }
+}
+
+.animate-heartbeat {
+  animation: heartbeat 2s ease-in-out infinite;
+}
+
+/* Smooth page transitions */
+.page-transition {
+  animation: fadeSlideUp 0.4s ease-out;
+}
+
+/* Loading spinner */
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--pink-200);
+  border-top-color: var(--pink-500);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+.text-love-pink {
+  color: var(--pink-500);
+}
+
+.bg-love-gradient {
+  background: linear-gradient(135deg, var(--pink-400), var(--rose-400));
+}
+
+.border-love {
+  border-color: var(--pink-300);
+}
+
+/* Smooth transitions for all interactive elements */
+button,
+a,
+input,
+textarea,
+select {
+  transition: all 0.3s ease;
+}
+
+/* Better focus states for accessibility */
+*:focus-visible {
+  outline: 3px solid var(--pink-400);
+  outline-offset: 2px;
+}
+
+/* Selection styling */
+::selection {
+  background: var(--pink-200);
+  color: var(--pink-600);
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
 }
