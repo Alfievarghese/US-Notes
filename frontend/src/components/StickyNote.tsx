@@ -8,7 +8,6 @@ interface StickyNoteProps {
     isOwn: boolean;
     isPublished: boolean;
     hasVoice?: boolean;
-    voiceMessage?: string;
     voiceDuration?: number;
     timeUntilPublish?: number | null;
     timeUntilExpiry?: number | null;
@@ -35,7 +34,6 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
     isOwn,
     isPublished,
     hasVoice,
-    voiceMessage,
     voiceDuration,
     timeUntilPublish,
     timeUntilExpiry,
