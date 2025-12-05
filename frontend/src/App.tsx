@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Login } from './pages/Login';
 import { RoomSetup } from './pages/RoomSetup';
-import { Dashboard } from './pages/Dashboard';
+import Dashboard from './pages/Dashboard';
 
 const RoomRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { user, room, isLoading } = useAuth();

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FloatingElements } from '../components/FloatingElements';
+import FloatingElements from '../components/FloatingElements';
 
 export const Login: React.FC = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -21,28 +21,31 @@ export const Login: React.FC = () => {
         }
     }, [user, navigate]);
 
+    const emailFromUsername = (u: string) => `${u.toLowerCase()}@usnotes.app`;
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         setIsLoading(true);
 
         try {
+            const email = emailFromUsername(username);
             if (isLogin) {
-                await login(username, password);
+                await login(email, password);
             } else {
-                await register(username, password, displayName);
+                await register(email, password, displayName, username);
             }
             navigate('/');
         } catch (err: any) {
-            setError(err.response?.data?.error || 'Something went wrong');
+            setError(err.message || 'Something went wrong');
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-            <FloatingElements heartCount={15} butterflyCount={6} />
+        <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-love-gradient">
+            <FloatingElements />
 
             <motion.div
                 initial={{ opacity: 0, y: 30, scale: 0.95 }}
@@ -65,23 +68,23 @@ export const Login: React.FC = () => {
                     <h1 className="font-romantic text-5xl text-gradient mt-4">
                         US
                     </h1>
-                    <p className="text-gray-300 font-handwritten mt-2 text-lg">
+                    <p className="text-gray-600 font-handwritten mt-2 text-lg">
                         A private space for you and your love
                     </p>
                 </motion.div>
 
                 {/* Tab switcher */}
-                <div className="flex mb-6 bg-white/5 rounded-xl p-1">
+                <div className="flex mb-6 bg-white/30 rounded-xl p-1">
                     <button
                         onClick={() => setIsLogin(true)}
-                        className={`flex-1 py-3 rounded-lg font-handwritten text-lg transition-all ${isLogin ? 'tab-active' : 'text-gray-400 hover:text-white'
+                        className={`flex-1 py-3 rounded-lg font-handwritten text-lg transition-all ${isLogin ? 'tab-active' : 'text-gray-500 hover:text-pink-600'
                             }`}
                     >
                         Login
                     </button>
                     <button
                         onClick={() => setIsLogin(false)}
-                        className={`flex-1 py-3 rounded-lg font-handwritten text-lg transition-all ${!isLogin ? 'tab-active' : 'text-gray-400 hover:text-white'
+                        className={`flex-1 py-3 rounded-lg font-handwritten text-lg transition-all ${!isLogin ? 'tab-active' : 'text-gray-500 hover:text-pink-600'
                             }`}
                     >
                         Register
@@ -95,7 +98,7 @@ export const Login: React.FC = () => {
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
-                            className="mb-4 p-3 bg-red-500/20 border border-red-500/30 text-red-300 rounded-xl text-center font-handwritten"
+                            className="mb-4 p-3 bg-red-100 border border-red-200 text-red-600 rounded-xl text-center font-medium text-sm"
                         >
                             {error}
                         </motion.div>
@@ -105,14 +108,14 @@ export const Login: React.FC = () => {
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-gray-300 font-handwritten mb-2 text-lg">
+                        <label className="block text-pink-700 font-handwritten mb-2 text-lg">
                             Username
                         </label>
                         <input
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            className="love-input"
+                            className="love-input w-full"
                             placeholder="Choose a username"
                             required
                             minLength={3}
@@ -126,14 +129,14 @@ export const Login: React.FC = () => {
                                 animate={{ opacity: 1, height: 'auto' }}
                                 exit={{ opacity: 0, height: 0 }}
                             >
-                                <label className="block text-gray-300 font-handwritten mb-2 text-lg">
+                                <label className="block text-pink-700 font-handwritten mb-2 text-lg">
                                     Display Name
                                 </label>
                                 <input
                                     type="text"
                                     value={displayName}
                                     onChange={(e) => setDisplayName(e.target.value)}
-                                    className="love-input"
+                                    className="love-input w-full "
                                     placeholder="How your partner sees you"
                                     required={!isLogin}
                                 />
@@ -142,14 +145,14 @@ export const Login: React.FC = () => {
                     </AnimatePresence>
 
                     <div>
-                        <label className="block text-gray-300 font-handwritten mb-2 text-lg">
+                        <label className="block text-pink-700 font-handwritten mb-2 text-lg">
                             Password
                         </label>
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="love-input"
+                            className="love-input w-full"
                             placeholder="Enter your password"
                             required
                             minLength={6}
