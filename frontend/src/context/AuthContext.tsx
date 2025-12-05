@@ -99,7 +99,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
                 if (authUser) {
                     const email = authUser.email || '';
-                    const username = email.split('@')[0] + Math.floor(Math.random() * 1000); // Generate unique-ish username
+                    const username = email.split('@')[0] + Math.floor(Math.random() * 1000);
                     const displayName = authUser.user_metadata.full_name || authUser.user_metadata.name || 'New User';
                     const avatar = authUser.user_metadata.avatar_url || authUser.user_metadata.picture || '';
 
@@ -114,7 +114,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                         });
 
                     if (insertError) {
-                        console.error('Error creating profile:', insertError);
+                        // If duplicate key error, just fetch the existing profile
+                        if (insertError.code === '23505') {
+                            console.log('Profile already exists, fetching...');
+                            const { data: existingData } = await supabase
+                                .from('users')
+                                .select('*')
+                                .eq('id', userId)
+                                .single();
+
+                            if (existingData) {
+                                setUser({
+                                    id: existingData.id,
+                                    username: existingData.username,
+                                    displayName: existingData.display_name,
+                                    profilePicture: existingData.profile_picture,
+                                    bio: existingData.bio,
+                                    roomId: existingData.room_id
+                                });
+                            }
+                        } else {
+                            console.error('Error creating profile:', insertError);
+                        }
                     } else {
                         // Profile created, set local state
                         setUser({

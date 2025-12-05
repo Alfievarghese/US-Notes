@@ -7,6 +7,7 @@ import NoteCreator from '../components/NoteCreator';
 import FloatingElements from '../components/FloatingElements';
 import ProfilePopup from '../components/ProfilePopup';
 import ProfileSettings from '../components/ProfileSettings';
+import { requestNotificationPermission, showNoteNotification } from '../utils/notifications';
 
 // Icons
 import {
@@ -85,6 +86,11 @@ const Dashboard: React.FC = () => {
         return await res.blob();
     };
 
+    // Request notification permission on mount
+    useEffect(() => {
+        requestNotificationPermission();
+    }, []);
+
     // --- Fetch Notes & Realtime Listener ---
     useEffect(() => {
         if (!room || !user) return;
@@ -150,7 +156,22 @@ const Dashboard: React.FC = () => {
             .channel(`room_notes:${room.id}`)
             .on('postgres_changes',
                 { event: '*', schema: 'public', table: 'notes', filter: `room_id=eq.${room.id}` },
-                () => {
+                (payload) => {
+                    console.log('Realtime update:', payload);
+
+                    // Check if it's a new published note from partner
+                    if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+                        const newNote = payload.new as any;
+
+                        // If partner published a note, show notification
+                        if (newNote.sender_id !== user?.id && newNote.is_published) {
+                            showNoteNotification(
+                                partner?.displayName || 'Your Partner',
+                                newNote.content || 'New note for you! 💕'
+                            );
+                        }
+                    }
+
                     fetchNotes();
                 }
             )

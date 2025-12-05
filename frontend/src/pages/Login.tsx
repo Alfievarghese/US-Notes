@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import FloatingElements from '../components/FloatingElements';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 export const Login: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -88,13 +89,7 @@ export const Login: React.FC = () => {
                     whileTap={{ scale: 0.98 }}
                 >
                     {isLoading ? (
-                        <motion.span
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                            className="inline-block"
-                        >
-                            💫
-                        </motion.span>
+                        <LoadingSpinner size="sm" color="#ffffff" />
                     ) : (
                         <>
                             <svg className="w-6 h-6" viewBox="0 0 24 24">

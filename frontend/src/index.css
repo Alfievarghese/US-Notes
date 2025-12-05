@@ -5,17 +5,17 @@
 @tailwind utilities;
 
 :root {
-  --pink-50: #fdf2f8;
-  --pink-100: #fce7f3;
-  --pink-200: #fbcfe8;
-  --pink-300: #f9a8d4;
-  --pink-400: #f472b6;
-  --pink-500: #ec4899;
-  --pink-600: #db2777;
-  --pink-700: #be185d;
-  --rose-300: #fda4af;
-  --rose-400: #fb7185;
-  --rose-500: #f43f5e;
+  --pink-50: #fef5f8;
+  --pink-100: #fdeef4;
+  --pink-200: #fce4ed;
+  --pink-300: #f9d4e4;
+  --pink-400: #f5b8d3;
+  --pink-500: #e99cc2;
+  --pink-600: #d87db0;
+  --pink-700: #c25a90;
+  --rose-300: #f9ccd4;
+  --rose-400: #f4a6b8;
+  --rose-500: #ee7e9a;
 }
 
 * {
@@ -31,9 +31,9 @@ html {
 body {
   font-family: 'Quicksand', sans-serif;
   min-height: 100vh;
-  background: linear-gradient(135deg, #fff5f7 0%, #ffe8f0 25%, #fff0f5 50%, #ffe8f0 75%, #fff5f7 100%);
+  background: linear-gradient(135deg, #fffbfd 0%, #fff8fb 25%, #fffafc 50%, #fff8fb 75%, #fffbfd 100%);
   background-attachment: fixed;
-  color: #4a1942;
+  color: #5a2952;
   overflow-x: hidden;
   font-weight: 500;
 }
@@ -44,12 +44,12 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(251, 207, 232, 0.3);
+  background: rgba(252, 228, 237, 0.2);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--pink-400), var(--rose-400));
+  background: linear-gradient(180deg, var(--pink-300), var(--rose-300));
   border-radius: 10px;
 }
 
@@ -58,11 +58,11 @@ body {
    ============================================ */
 .sticky-note {
   position: relative;
-  background: linear-gradient(145deg, #fffbf5 0%, #fff9f0 100%);
+  background: linear-gradient(145deg, #fffefa 0%, #fffcf5 100%);
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(219, 39, 119, 0.15), 0 5px 15px rgba(0, 0, 0, 0.08);
-  color: #3d0f35;
-  transition: all 0.4s ease;
+  box-shadow: 0 8px 20px rgba(233, 156, 194, 0.12), 0 3px 10px rgba(0, 0, 0, 0.04);
+  color: #5a2952;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: visible;
 }
 
@@ -73,13 +73,13 @@ body {
   left: 0;
   right: 0;
   height: 6px;
-  background: linear-gradient(90deg, var(--pink-300), var(--rose-400), var(--pink-500));
+  background: linear-gradient(90deg, var(--pink-300), var(--rose-300), var(--pink-400));
   border-radius: 12px 12px 0 0;
 }
 
 .sticky-note:hover {
-  transform: translateY(-5px) scale(1.02) !important;
-  box-shadow: 0 20px 40px rgba(219, 39, 119, 0.25);
+  transform: translateY(-3px) scale(1.01) !important;
+  box-shadow: 0 12px 28px rgba(233, 156, 194, 0.18), 0 5px 12px rgba(0, 0, 0, 0.06);
 }
 
 .sticky-note.yellow {
