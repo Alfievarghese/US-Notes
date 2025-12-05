@@ -92,64 +92,66 @@ const Dashboard: React.FC = () => {
         requestNotificationPermission();
     }, []);
 
+    // --- Fetch Notes Function (extracted for reuse) ---
+    const fetchNotes = async () => {
+        if (!room || !user) return;
+
+        const { data, error } = await supabase
+            .from('notes')
+            .select('*, sender:sender_id(display_name, profile_picture)')
+            .eq('room_id', room.id)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error fetching notes:', error);
+            return;
+        }
+        if (data) {
+            const mappedNotes: Note[] = data.map((n: any) => ({
+                id: n.id,
+                content: n.content,
+                senderId: n.sender_id,
+                roomId: n.room_id,
+                imageUrl: n.image_url,
+                voiceUrl: n.voice_url,
+                voiceDuration: n.voice_duration,
+                createdAt: n.created_at,
+                publishedAt: n.published_at,
+                isPublished: n.is_published,
+                sender: {
+                    displayName: n.sender?.display_name || 'Partner',
+                    profilePicture: n.sender?.profile_picture
+                }
+            }));
+
+            // Process each note for publish status and expiry
+            const processed = mappedNotes.map(n => processNotePublishStatus(n));
+
+            // Filter: Receiver only sees published notes, Sender sees all their notes
+            const filtered = processed.filter(n => {
+                if (n.senderId === user.id) return true;
+                return n.isPublished;
+            });
+
+            // Remove expired notes (3 days after publish)
+            const nonExpired = filtered.filter(n => {
+                if (!n.publishedAt || !n.isPublished) return true;
+                const publishTime = new Date(n.publishedAt).getTime();
+                const now = Date.now();
+                const daysSincePublish = (now - publishTime) / (1000 * 60 * 60 * 24);
+                return daysSincePublish < 3;
+            });
+
+            setNotes(nonExpired);
+        }
+        setIsLoading(false);
+    };
+
     // --- Fetch Notes & Realtime Listener ---
     useEffect(() => {
         if (!room || !user) return;
 
         setIsLoading(true);
-
-        const fetchNotes = async () => {
-            const { data, error } = await supabase
-                .from('notes')
-                .select('*, sender:sender_id(display_name, profile_picture)')
-                .eq('room_id', room.id)
-                .order('created_at', { ascending: false });
-
-            if (error) {
-                console.error('Error fetching notes:', error);
-                return;
-            }
-            if (data) {
-                const mappedNotes: Note[] = data.map((n: any) => ({
-                    id: n.id,
-                    content: n.content,
-                    senderId: n.sender_id,
-                    roomId: n.room_id,
-                    imageUrl: n.image_url,
-                    voiceUrl: n.voice_url,
-                    voiceDuration: n.voice_duration,
-                    createdAt: n.created_at,
-                    publishedAt: n.published_at,
-                    isPublished: n.is_published,
-                    sender: {
-                        displayName: n.sender?.display_name || 'Partner',
-                        profilePicture: n.sender?.profile_picture
-                    }
-                }));
-
-                // Process each note for publish status and expiry
-                const processed = mappedNotes.map(n => processNotePublishStatus(n));
-
-                // Filter: Receiver only sees published notes, Sender sees all their notes
-                const filtered = processed.filter(n => {
-                    if (n.senderId === user.id) return true; // Sender sees all their notes
-                    return n.isPublished; // Receiver only sees published notes
-                });
-
-                // Remove expired notes (3 days after publish)
-                const nonExpired = filtered.filter(n => {
-                    if (!n.publishedAt || !n.isPublished) return true;
-                    const publishTime = new Date(n.publishedAt).getTime();
-                    const now = Date.now();
-                    const daysSincePublish = (now - publishTime) / (1000 * 60 * 60 * 24);
-                    return daysSincePublish < 3;
-                });
-
-                setNotes(nonExpired);
-            }
-            setIsLoading(false);
-        };
-
         fetchNotes();
 
         // Realtime Subscription
@@ -196,6 +198,9 @@ const Dashboard: React.FC = () => {
                 .eq('id', noteId);
 
             if (error) throw error;
+
+            // Immediately fetch notes to update UI
+            await fetchNotes();
             showToast('Note published! 💕');
         } catch (err: any) {
             console.error(err);
@@ -275,26 +280,26 @@ const Dashboard: React.FC = () => {
             )}
 
             {/* Navbar */}
-            <nav className="navbar fixed top-0 w-full z-40 px-6 py-4 flex justify-between items-center">
-                <div className="flex items-center gap-4">
-                    <h1 className="font-logo text-3xl text-gradient cursor-pointer">
+            <nav className="navbar fixed top-0 w-full z-40 px-3 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
+                <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between sm:justify-start">
+                    <h1 className="font-logo text-2xl sm:text-3xl text-gradient cursor-pointer">
                         Kunji Kurups
                     </h1>
                     {room && (
-                        <div className="glass-card px-4 py-2">
-                            <p className="text-xs text-gray-600">Room Code</p>
-                            <p className="text-lg font-bold text-pink-700 tracking-wider">{room.roomCode}</p>
+                        <div className="glass-card px-3 py-1 sm:px-4 sm:py-2">
+                            <p className="text-xs text-gray-600">Room</p>
+                            <p className="text-sm sm:text-lg font-bold text-pink-700 tracking-wider">{room.roomCode}</p>
                         </div>
                     )}
                 </div>
 
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-3 sm:gap-6 w-full sm:w-auto justify-end">
                     {/* Partner Badge - Text Only */}
                     <div
-                        className="glass-card px-4 py-2 cursor-pointer hover:bg-pink-50 transition-colors"
+                        className="glass-card px-3 py-1 sm:px-4 sm:py-2 cursor-pointer hover:bg-pink-50 transition-all duration-200"
                         onClick={() => setShowPartnerProfile(true)}
                     >
-                        <p className="text-sm font-bold text-pink-700">{partnerName}</p>
+                        <p className="text-xs sm:text-sm font-bold text-pink-700">{partnerName}</p>
                         <p className="text-xs text-gray-500">
                             {partner ? 'Connected' : 'Waiting...'}
                         </p>
@@ -302,18 +307,18 @@ const Dashboard: React.FC = () => {
 
                     <button
                         onClick={() => setShowProfileSettings(true)}
-                        className="p-3 rounded-full hover:bg-white/50 text-pink-700 transition-all hover:rotate-90"
+                        className="p-2 sm:p-3 rounded-full hover:bg-white/50 text-pink-700 transition-all duration-200 hover:rotate-90"
                         title="Profile Settings"
                     >
-                        <FiSettings size={24} />
+                        <FiSettings size={20} className="sm:w-6 sm:h-6" />
                     </button>
 
                     <button
                         onClick={logout}
-                        className="p-3 rounded-full hover:bg-white/50 text-pink-700 transition-all hover:rotate-180"
+                        className="p-2 sm:p-3 rounded-full hover:bg-white/50 text-pink-700 transition-all duration-200 hover:rotate-180"
                         title="Logout"
                     >
-                        <FiLogOut size={24} />
+                        <FiLogOut size={20} className="sm:w-6 sm:h-6" />
                     </button>
                 </div>
             </nav>
