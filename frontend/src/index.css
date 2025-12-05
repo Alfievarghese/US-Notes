@@ -31,9 +31,9 @@ html {
 body {
   font-family: 'Quicksand', sans-serif;
   min-height: 100vh;
-  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 25%, #fbcfe8 50%, #fce7f3 75%, #fdf2f8 100%);
+  background: linear-gradient(135deg, #fff5f7 0%, #ffe8f0 25%, #fff0f5 50%, #ffe8f0 75%, #fff5f7 100%);
   background-attachment: fixed;
-  color: #3d0f35;
+  color: #4a1942;
   overflow-x: hidden;
   font-weight: 500;
 }
