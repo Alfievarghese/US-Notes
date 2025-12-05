@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { motion } from 'framer-motion';
 
 interface FloatingElementsProps {
     heartCount?: number;
@@ -14,57 +15,97 @@ const generateStableElements = (count: number, seed: number) => {
         elements.push({
             id: `${seed}-${i}`,
             left: (hash % 100),
-            size: 16 + (hash % 20),
+            top: (hash % 80),
+            size: 20 + (hash % 24),
             delay: (hash % 200) / 10,
-            duration: 12 + (hash % 10),
-            animationType: hash % 3, // 0, 1, or 2 for different animations
+            duration: 15 + (hash % 15),
+            animationType: hash % 3,
         });
     }
     return elements;
 };
 
 export const FloatingElements: React.FC<FloatingElementsProps> = ({
-    heartCount = 12,
-    butterflyCount = 6
+    heartCount = 10,
+    butterflyCount = 8
 }) => {
-    // UseMemo with empty deps ensures these don't regenerate on rerender
     const hearts = useMemo(() => generateStableElements(heartCount, 1234), [heartCount]);
     const butterflies = useMemo(() => generateStableElements(butterflyCount, 5678), [butterflyCount]);
 
     return (
         <>
-            {/* Floating Hearts - CSS animations (won't reset on state change) */}
+            {/* Floating Hearts - Draggable */}
             <div className="floating-hearts" aria-hidden="true">
                 {hearts.map((heart) => (
-                    <div
+                    <motion.div
                         key={heart.id}
-                        className={`heart heart-animation-${heart.animationType}`}
+                        drag
+                        dragMomentum={false}
+                        dragElastic={0.1}
+                        whileHover={{ scale: 1.3, rotate: 15, cursor: 'grab' }}
+                        whileTap={{ scale: 1.1, cursor: 'grabbing' }}
                         style={{
+                            position: 'absolute',
                             left: `${heart.left}%`,
+                            top: `${heart.top}%`,
                             fontSize: `${heart.size}px`,
-                            animationDelay: `${heart.delay}s`,
-                            animationDuration: `${heart.duration}s`,
+                            zIndex: 1,
+                            userSelect: 'none',
+                        }}
+                        animate={{
+                            y: [0, -30, 0],
+                            x: [0, Math.sin(heart.id.length) * 20, 0],
+                            rotate: [0, 10, -10, 0],
+                        }}
+                        transition={{
+                            duration: heart.duration,
+                            delay: heart.delay,
+                            repeat: Infinity,
+                            ease: "easeInOut"
                         }}
                     >
                         ❤️
-                    </div>
+                    </motion.div>
                 ))}
             </div>
 
-            {/* Butterflies - CSS animations */}
+            {/* Butterflies - Draggable */}
             {butterflies.map((butterfly) => (
-                <div
+                <motion.div
                     key={butterfly.id}
-                    className={`butterfly butterfly-animation-${butterfly.animationType}`}
+                    drag
+                    dragMomentum={false}
+                    dragElastic={0.15}
+                    whileHover={{
+                        scale: 1.4,
+                        rotate: [0, -10, 10, -10, 0],
+                        cursor: 'grab',
+                        transition: { duration: 0.3 }
+                    }}
+                    whileTap={{ scale: 1.2, cursor: 'grabbing' }}
                     style={{
+                        position: 'absolute',
                         left: `${butterfly.left}%`,
-                        top: `${10 + (butterfly.animationType * 25)}%`,
-                        animationDelay: `${butterfly.delay}s`,
+                        top: `${butterfly.top}%`,
+                        fontSize: `${butterfly.size}px`,
+                        zIndex: 1,
+                        userSelect: 'none',
+                    }}
+                    animate={{
+                        x: [0, 40, -30, 40, 0],
+                        y: [0, -25, -15, -30, 0],
+                        rotate: [0, 5, -5, 3, -3, 0],
+                    }}
+                    transition={{
+                        duration: butterfly.duration,
+                        delay: butterfly.delay,
+                        repeat: Infinity,
+                        ease: "easeInOut"
                     }}
                     aria-hidden="true"
                 >
                     🦋
-                </div>
+                </motion.div>
             ))}
         </>
     );
