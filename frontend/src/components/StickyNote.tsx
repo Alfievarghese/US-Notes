@@ -12,8 +12,8 @@ interface StickyNoteProps {
     hasImage?: boolean;
     imageData?: string;
     voiceDuration?: number;
-    timeUntilPublish?: number | null;
-    timeUntilExpiry?: number | null;
+    timeUntilPublish?: string; // Changed to string (formatted time)
+    daysUntilExpiry?: number; // Days until auto-deletion
     onPublish?: () => void;
     onPlayVoice?: () => void;
     onProfileClick?: () => void;
@@ -21,15 +21,6 @@ interface StickyNoteProps {
 }
 
 const COLORS = ['yellow', 'pink', 'blue', 'green', 'peach'] as const;
-
-const formatTime = (ms: number): string => {
-    if (ms <= 0) return 'Now';
-    const hours = Math.floor(ms / (1000 * 60 * 60));
-    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
-    if (hours > 24) return `${Math.floor(hours / 24)}d ${hours % 24}h`;
-    if (hours > 0) return `${hours}h ${minutes}m`;
-    return `${minutes}m`;
-};
 
 export const StickyNote: React.FC<StickyNoteProps> = ({
     content,
@@ -42,7 +33,7 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
     imageData,
     voiceDuration,
     timeUntilPublish,
-    timeUntilExpiry,
+    daysUntilExpiry,
     onPublish,
     onPlayVoice,
     onProfileClick,
@@ -144,16 +135,16 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
 
             {/* Timer */}
             <div className="mt-3 text-xs text-gray-500 space-y-1">
-                {!isPublished && timeUntilPublish != null && (
+                {!isPublished && timeUntilPublish && (
                     <div className="flex justify-between">
                         <span>Auto-publish:</span>
-                        <span className="font-semibold text-amber-600">{formatTime(timeUntilPublish)}</span>
+                        <span className="font-semibold text-amber-600">{timeUntilPublish}</span>
                     </div>
                 )}
-                {isPublished && timeUntilExpiry != null && (
+                {isPublished && daysUntilExpiry != null && (
                     <div className="flex justify-between">
-                        <span>Expires:</span>
-                        <span className="font-semibold text-pink-600">{formatTime(timeUntilExpiry)}</span>
+                        <span>Deletes in:</span>
+                        <span className="font-semibold text-pink-600">{daysUntilExpiry.toFixed(1)} days</span>
                     </div>
                 )}
             </div>

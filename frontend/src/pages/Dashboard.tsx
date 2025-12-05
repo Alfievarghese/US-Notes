@@ -6,10 +6,11 @@ import StickyNote from '../components/StickyNote';
 import NoteCreator from '../components/NoteCreator';
 import FloatingElements from '../components/FloatingElements';
 import ProfilePopup from '../components/ProfilePopup';
+import ProfileSettings from '../components/ProfileSettings';
 
 // Icons
 import {
-    FiLogOut, FiSmile
+    FiLogOut, FiSmile, FiSettings
 } from 'react-icons/fi';
 
 interface Note {
@@ -23,8 +24,10 @@ interface Note {
     voiceMessage?: string; // Legacy base64
     voiceDuration?: number;
     createdAt: any;
+    publishedAt?: any; // When note was published
     isPublished: boolean;
     timeUntilPublish?: string;
+    daysUntilExpiry?: number; // Days left before auto-deletion
     forceAccess?: boolean;
     sender?: { displayName: string; profilePicture?: string; bio?: string };
 }
@@ -35,6 +38,7 @@ const Dashboard: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'notes' | 'diary'>('notes');
     const [showPartnerProfile, setShowPartnerProfile] = useState(false);
+    const [showProfileSettings, setShowProfileSettings] = useState(false);
 
     // Toasts
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -59,10 +63,19 @@ const Dashboard: React.FC = () => {
         const isReady = diff >= hours24;
         const timeLeft = hours24 - diff;
 
+        // Calculate days until expiry (3 days from publish)
+        let daysUntilExpiry: number | undefined;
+        if (note.publishedAt && note.isPublished) {
+            const publishTime = new Date(note.publishedAt).getTime();
+            const daysSincePublish = (now - publishTime) / (1000 * 60 * 60 * 24);
+            daysUntilExpiry = Math.max(0, 3 - daysSincePublish);
+        }
+
         return {
             ...note,
             isPublished: note.isPublished || isReady,
-            timeUntilPublish: isReady ? undefined : msToTime(timeLeft)
+            timeUntilPublish: isReady || note.isPublished ? undefined : msToTime(timeLeft),
+            daysUntilExpiry
         };
     };
 
@@ -99,15 +112,33 @@ const Dashboard: React.FC = () => {
                     voiceUrl: n.voice_url,
                     voiceDuration: n.voice_duration,
                     createdAt: n.created_at,
+                    publishedAt: n.published_at,
                     isPublished: n.is_published,
-                    forceAccess: n.force_access,
                     sender: {
                         displayName: n.sender?.display_name || 'Partner',
                         profilePicture: n.sender?.profile_picture
                     }
                 }));
+
+                // Process each note for publish status and expiry
                 const processed = mappedNotes.map(n => processNotePublishStatus(n));
-                setNotes(processed);
+
+                // Filter: Receiver only sees published notes, Sender sees all their notes
+                const filtered = processed.filter(n => {
+                    if (n.senderId === user.id) return true; // Sender sees all their notes
+                    return n.isPublished; // Receiver only sees published notes
+                });
+
+                // Remove expired notes (3 days after publish)
+                const nonExpired = filtered.filter(n => {
+                    if (!n.publishedAt || !n.isPublished) return true;
+                    const publishTime = new Date(n.publishedAt).getTime();
+                    const now = Date.now();
+                    const daysSincePublish = (now - publishTime) / (1000 * 60 * 60 * 24);
+                    return daysSincePublish < 3;
+                });
+
+                setNotes(nonExpired);
             }
             setIsLoading(false);
         };
@@ -130,6 +161,25 @@ const Dashboard: React.FC = () => {
         };
 
     }, [room, user]);
+
+    // --- Publish Note Early (sender only) ---
+    const handlePublishNote = async (noteId: string) => {
+        try {
+            const { error } = await supabase
+                .from('notes')
+                .update({
+                    is_published: true,
+                    published_at: new Date().toISOString()
+                })
+                .eq('id', noteId);
+
+            if (error) throw error;
+            showToast('Note published! 💕');
+        } catch (err: any) {
+            console.error(err);
+            showToast('Failed to publish note', 'error');
+        }
+    };
 
 
     // --- Create Note ---
@@ -229,6 +279,14 @@ const Dashboard: React.FC = () => {
                     </div>
 
                     <button
+                        onClick={() => setShowProfileSettings(true)}
+                        className="p-3 rounded-full hover:bg-white/50 text-pink-700 transition-all hover:rotate-90"
+                        title="Profile Settings"
+                    >
+                        <FiSettings size={24} />
+                    </button>
+
+                    <button
                         onClick={logout}
                         className="p-3 rounded-full hover:bg-white/50 text-pink-700 transition-all hover:rotate-180"
                         title="Logout"
@@ -307,11 +365,13 @@ const Dashboard: React.FC = () => {
                                                 hasImage={!!(note.imageUrl || note.imageData)}
                                                 imageData={note.imageUrl || note.imageData}
                                                 voiceDuration={note.voiceDuration}
+                                                timeUntilPublish={note.timeUntilPublish}
+                                                daysUntilExpiry={note.daysUntilExpiry}
+                                                onPublish={!note.isPublished && isOwn ? () => handlePublishNote(note.id) : undefined}
                                                 onPlayVoice={() => {
                                                     const audio = new Audio(note.voiceUrl || note.voiceMessage);
                                                     audio.play();
                                                 }}
-                                                timeUntilPublish={null}
                                                 colorIndex={i}
                                             />
                                         );
@@ -328,6 +388,12 @@ const Dashboard: React.FC = () => {
                 isOpen={showPartnerProfile}
                 onClose={() => setShowPartnerProfile(false)}
                 profile={partner}
+            />
+
+            {/* Profile Settings */}
+            <ProfileSettings
+                isOpen={showProfileSettings}
+                onClose={() => setShowProfileSettings(false)}
             />
         </div>
     );
