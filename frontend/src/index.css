@@ -15,9 +15,6 @@
   --rose-300: #fda4af;
   --rose-400: #fb7185;
   --rose-500: #f43f5e;
-  --peach-100: #fff5eb;
-  --peach-200: #ffe4cc;
-  --cream: #fffbf7;
 }
 
 * {
@@ -33,18 +30,13 @@ html {
 body {
   font-family: 'Quicksand', sans-serif;
   min-height: 100vh;
-  background: linear-gradient(135deg,
-      #fdf2f8 0%,
-      #fce7f3 25%,
-      #fbcfe8 50%,
-      #fce7f3 75%,
-      #fdf2f8 100%);
+  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 25%, #fbcfe8 50%, #fce7f3 75%, #fdf2f8 100%);
   background-attachment: fixed;
-  color: #831843;
+  color: #4a1942;
   overflow-x: hidden;
 }
 
-/* Animated background gradient */
+/* Subtle background overlay */
 body::before {
   content: '';
   position: fixed;
@@ -54,26 +46,12 @@ body::before {
   bottom: 0;
   background:
     radial-gradient(ellipse at 20% 30%, rgba(251, 207, 232, 0.4) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 70%, rgba(249, 168, 212, 0.3) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(253, 164, 175, 0.2) 0%, transparent 60%);
+    radial-gradient(ellipse at 80% 70%, rgba(249, 168, 212, 0.3) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
-  animation: gradientShift 15s ease-in-out infinite;
 }
 
-@keyframes gradientShift {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.7;
-  }
-}
-
-/* Custom scrollbar - pink theme */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
 }
@@ -86,26 +64,18 @@ body::before {
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, var(--pink-400), var(--rose-400));
   border-radius: 10px;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, var(--pink-500), var(--rose-500));
 }
 
 /* ============================================
-   STICKY NOTES - Soft pastel colors
+   STICKY NOTES
    ============================================ */
 .sticky-note {
   position: relative;
   background: linear-gradient(145deg, #fffbf5 0%, #fff9f0 100%);
   border-radius: 8px;
-  box-shadow:
-    0 10px 30px rgba(219, 39, 119, 0.15),
-    0 5px 15px rgba(0, 0, 0, 0.08),
-    inset 0 -3px 10px rgba(251, 207, 232, 0.3);
-  color: #6b2149;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 10px 30px rgba(219, 39, 119, 0.15), 0 5px 15px rgba(0, 0, 0, 0.08);
+  color: #4a1942;
+  transition: all 0.4s ease;
   overflow: hidden;
 }
 
@@ -121,10 +91,8 @@ body::before {
 }
 
 .sticky-note:hover {
-  transform: translateY(-5px) rotate(0deg) !important;
-  box-shadow:
-    0 20px 40px rgba(219, 39, 119, 0.2),
-    0 10px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px) !important;
+  box-shadow: 0 20px 40px rgba(219, 39, 119, 0.2);
 }
 
 .sticky-note.yellow {
@@ -168,7 +136,7 @@ body::before {
 }
 
 /* ============================================
-   FLOATING ELEMENTS - Hearts & Butterflies
+   FLOATING ELEMENTS
    ============================================ */
 .butterfly {
   position: fixed;
@@ -177,28 +145,27 @@ body::before {
   animation: butterflyFly 12s ease-in-out infinite;
   pointer-events: none;
   z-index: 1;
-  filter: drop-shadow(0 2px 4px rgba(219, 39, 119, 0.2));
 }
 
 @keyframes butterflyFly {
   0% {
-    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    transform: translateY(0) translateX(0) rotate(0deg);
   }
 
   25% {
-    transform: translateY(-40px) translateX(30px) rotate(15deg) scale(1.1);
+    transform: translateY(-40px) translateX(30px) rotate(15deg);
   }
 
   50% {
-    transform: translateY(-20px) translateX(-20px) rotate(-10deg) scale(1);
+    transform: translateY(-20px) translateX(-20px) rotate(-10deg);
   }
 
   75% {
-    transform: translateY(-50px) translateX(15px) rotate(12deg) scale(1.05);
+    transform: translateY(-50px) translateX(15px) rotate(12deg);
   }
 
   100% {
-    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    transform: translateY(0) translateX(0) rotate(0deg);
   }
 }
 
@@ -217,12 +184,11 @@ body::before {
   position: absolute;
   opacity: 0.25;
   animation: floatUp 18s linear infinite;
-  filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.3));
 }
 
 @keyframes floatUp {
   0% {
-    transform: translateY(100vh) rotate(0deg) scale(0.8);
+    transform: translateY(100vh) rotate(0deg);
     opacity: 0;
   }
 
@@ -230,102 +196,67 @@ body::before {
     opacity: 0.25;
   }
 
-  50% {
-    transform: translateY(50vh) rotate(180deg) scale(1);
-  }
-
   90% {
     opacity: 0.25;
   }
 
   100% {
-    transform: translateY(-100px) rotate(360deg) scale(0.8);
+    transform: translateY(-100px) rotate(360deg);
     opacity: 0;
   }
 }
 
 /* ============================================
-   GLASS CARDS - Soft pink glassmorphism
+   GLASS CARDS
    ============================================ */
 .glass-card {
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(251, 207, 232, 0.6);
   border-radius: 24px;
-  box-shadow:
-    0 8px 32px rgba(219, 39, 119, 0.1),
-    0 2px 8px rgba(0, 0, 0, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 32px rgba(219, 39, 119, 0.1);
   transition: all 0.3s ease;
 }
 
 .glass-card:hover {
-  box-shadow:
-    0 12px 40px rgba(219, 39, 119, 0.15),
-    0 4px 12px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12px 40px rgba(219, 39, 119, 0.15);
   transform: translateY(-2px);
 }
 
 /* ============================================
-   BUTTONS - Rounded, soft, inviting
+   BUTTONS
    ============================================ */
 .love-button {
   @apply px-8 py-4 rounded-2xl font-semibold text-lg;
   background: linear-gradient(135deg, var(--pink-400) 0%, var(--rose-400) 50%, var(--pink-500) 100%);
-  background-size: 200% 200%;
   color: white;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow:
-    0 6px 20px rgba(236, 72, 153, 0.35),
-    0 3px 10px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(236, 72, 153, 0.35);
   border: none;
   cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-
-.love-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s ease;
 }
 
 .love-button:hover {
   transform: translateY(-3px) scale(1.02);
-  box-shadow:
-    0 10px 30px rgba(236, 72, 153, 0.45),
-    0 5px 15px rgba(0, 0, 0, 0.12);
-  background-position: 100% 0;
-}
-
-.love-button:hover::before {
-  left: 100%;
+  box-shadow: 0 10px 30px rgba(236, 72, 153, 0.45);
 }
 
 .love-button:active {
-  transform: translateY(-1px) scale(1);
+  transform: translateY(-1px);
 }
 
 .love-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
-  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.2);
 }
 
 .love-button-secondary {
   @apply px-8 py-4 rounded-2xl font-semibold text-lg;
   background: rgba(255, 255, 255, 0.8);
   border: 2px solid var(--pink-300);
-  color: var(--pink-500);
+  color: var(--pink-600);
   transition: all 0.3s ease;
   cursor: pointer;
 }
@@ -334,45 +265,44 @@ body::before {
   background: rgba(251, 207, 232, 0.3);
   border-color: var(--pink-400);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(236, 72, 153, 0.2);
 }
 
 /* ============================================
-   INPUTS - Soft, warm, inviting
+   INPUTS
    ============================================ */
 .love-input {
   @apply w-full px-5 py-4 rounded-2xl;
   background: rgba(255, 255, 255, 0.9);
   border: 2px solid var(--pink-200);
-  color: #6b2149;
+  color: #4a1942;
   font-family: 'Quicksand', sans-serif;
   font-size: 1.1rem;
   font-weight: 500;
   transition: all 0.3s ease;
-  box-shadow: inset 0 2px 4px rgba(251, 207, 232, 0.2);
 }
 
 .love-input::placeholder {
-  color: rgba(107, 33, 73, 0.4);
+  color: rgba(74, 25, 66, 0.4);
 }
 
 .love-input:focus {
   outline: none;
   border-color: var(--pink-400);
-  box-shadow:
-    0 0 0 4px rgba(244, 114, 182, 0.15),
-    inset 0 2px 4px rgba(251, 207, 232, 0.3);
+  box-shadow: 0 0 0 4px rgba(244, 114, 182, 0.15);
   background: white;
 }
 
 /* ============================================
-   TYPOGRAPHY
+   TYPOGRAPHY - Fixed text-gradient
    ============================================ */
 .text-gradient {
-  background: linear-gradient(135deg, var(--pink-500), var(--rose-400), var(--pink-400));
+  background: linear-gradient(135deg, #be185d, #e11d48, #db2777);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  padding-bottom: 0.1em;
+  display: inline-block;
+  line-height: 1.4;
 }
 
 .font-handwritten {
@@ -390,7 +320,7 @@ body::before {
 }
 
 /* ============================================
-   NAVBAR - Clean, airy
+   NAVBAR
    ============================================ */
 .navbar {
   background: rgba(255, 255, 255, 0.85);
@@ -401,18 +331,19 @@ body::before {
 }
 
 /* ============================================
-   ROOM CODE - Pretty and prominent
+   ROOM CODE
    ============================================ */
 .room-code {
   font-family: 'Quicksand', sans-serif;
   letter-spacing: 0.4em;
   font-size: 2.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--pink-500), var(--rose-400));
+  background: linear-gradient(135deg, #be185d, #db2777);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 2px 10px rgba(236, 72, 153, 0.2);
+  padding-bottom: 0.1em;
+  display: inline-block;
 }
 
 /* ============================================
@@ -425,11 +356,6 @@ body::before {
   transition: all 0.3s ease;
 }
 
-.voice-recorder:hover {
-  border-color: rgba(244, 114, 182, 0.6);
-  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.15);
-}
-
 .recording-pulse {
   animation: recordPulse 1.5s ease-in-out infinite;
 }
@@ -439,17 +365,15 @@ body::before {
   0%,
   100% {
     box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.5);
-    transform: scale(1);
   }
 
   50% {
     box-shadow: 0 0 0 20px rgba(244, 63, 94, 0);
-    transform: scale(1.05);
   }
 }
 
 /* ============================================
-   TABS - Rounded, pill-style
+   TABS
    ============================================ */
 .tab-active {
   background: linear-gradient(135deg, var(--pink-400), var(--rose-400));
@@ -458,25 +382,20 @@ body::before {
 }
 
 /* ============================================
-   PROFILE & AVATARS
+   PROFILE
    ============================================ */
 .profile-pic {
   width: 80px;
   height: 80px;
   border-radius: 50%;
   border: 4px solid white;
-  box-shadow:
-    0 0 0 4px var(--pink-300),
-    0 4px 15px rgba(236, 72, 153, 0.25);
+  box-shadow: 0 0 0 4px var(--pink-300), 0 4px 15px rgba(236, 72, 153, 0.25);
   object-fit: cover;
   transition: all 0.3s ease;
 }
 
 .profile-pic:hover {
   transform: scale(1.05);
-  box-shadow:
-    0 0 0 4px var(--pink-400),
-    0 6px 20px rgba(236, 72, 153, 0.35);
 }
 
 /* ============================================
@@ -506,52 +425,18 @@ body::before {
 
   0%,
   100% {
-    box-shadow: 0 0 15px rgba(244, 114, 182, 0.4), 0 0 30px rgba(244, 114, 182, 0.2);
+    box-shadow: 0 0 15px rgba(244, 114, 182, 0.4);
   }
 
   50% {
-    box-shadow: 0 0 25px rgba(244, 114, 182, 0.6), 0 0 50px rgba(244, 114, 182, 0.3);
+    box-shadow: 0 0 25px rgba(244, 114, 182, 0.6);
   }
 }
 
-/* Page enter animation */
-@keyframes fadeSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.animate-heartbeat {
+  animation: heartbeat 2s ease-in-out infinite;
 }
 
-.animate-fade-in {
-  animation: fadeSlideUp 0.6s ease-out forwards;
-}
-
-/* Shimmer effect */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-.shimmer {
-  background: linear-gradient(90deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.5) 50%,
-      rgba(255, 255, 255, 0) 100%);
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
-}
-
-/* Heartbeat animation for love-related elements */
 @keyframes heartbeat {
 
   0%,
@@ -576,47 +461,17 @@ body::before {
   }
 }
 
-.animate-heartbeat {
-  animation: heartbeat 2s ease-in-out infinite;
-}
-
-/* Smooth page transitions */
-.page-transition {
-  animation: fadeSlideUp 0.4s ease-out;
-}
-
-/* Loading spinner */
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid var(--pink-200);
-  border-top-color: var(--pink-500);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 /* ============================================
-   UTILITY CLASSES
+   UTILITIES
    ============================================ */
 .text-love-pink {
-  color: var(--pink-500);
+  color: var(--pink-600);
 }
 
 .bg-love-gradient {
   background: linear-gradient(135deg, var(--pink-400), var(--rose-400));
 }
 
-.border-love {
-  border-color: var(--pink-300);
-}
-
-/* Smooth transitions for all interactive elements */
 button,
 a,
 input,
@@ -625,21 +480,7 @@ select {
   transition: all 0.3s ease;
 }
 
-/* Better focus states for accessibility */
-*:focus-visible {
-  outline: 3px solid var(--pink-400);
-  outline-offset: 2px;
-}
-
-/* Selection styling */
 ::selection {
   background: var(--pink-200);
   color: var(--pink-600);
-}
-
-/* Print styles */
-@media print {
-  .no-print {
-    display: none !important;
-  }
 }
