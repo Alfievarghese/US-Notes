@@ -50,8 +50,22 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
             },
             token
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Registration error:', error);
+
+        // Handle Mongoose validation errors
+        if (error.name === 'ValidationError') {
+            const messages = Object.values(error.errors).map((err: any) => err.message);
+            res.status(400).json({ error: messages.join(', ') });
+            return;
+        }
+
+        // Handle duplicate key errors
+        if (error.code === 11000) {
+            res.status(400).json({ error: 'Username already taken' });
+            return;
+        }
+
         res.status(500).json({ error: 'Failed to register user' });
     }
 });
