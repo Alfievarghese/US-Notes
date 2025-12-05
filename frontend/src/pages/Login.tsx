@@ -63,7 +63,7 @@ export const Login: React.FC = () => {
                         ❤️
                     </motion.span>
                     <h1 className="font-romantic text-5xl text-gradient mt-4">
-                        Kunji Kurups
+                        US
                     </h1>
                     <p className="text-gray-300 font-handwritten mt-2 text-lg">
                         A private space for you and your love
