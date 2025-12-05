@@ -8,13 +8,12 @@ interface Note {
     sender: {
         _id: string;
         displayName: string;
-        username: string;
     };
-    createdAt: string;
-    publishTime: string;
     isPublished: boolean;
-    expiryTime?: string;
     isOwn: boolean;
+    hasVoice?: boolean;
+    voiceMessage?: string;
+    voiceDuration?: number;
     timeUntilPublish: number | null;
     timeUntilExpiry: number | null;
 }
@@ -22,13 +21,13 @@ interface Note {
 interface FloatingNotesProps {
     notes: Note[];
     onPublish: (noteId: string) => Promise<void>;
-    isLoading: boolean;
+    onPlayVoice?: (voiceMessage: string) => void;
 }
 
 export const FloatingNotes: React.FC<FloatingNotesProps> = ({
     notes,
     onPublish,
-    isLoading
+    onPlayVoice
 }) => {
     if (notes.length === 0) {
         return (
@@ -51,26 +50,24 @@ export const FloatingNotes: React.FC<FloatingNotesProps> = ({
                 >
                     💌
                 </motion.div>
-                <h3 className="font-handwritten text-2xl text-gray-600 mb-2">
+                <h3 className="font-handwritten text-2xl text-gray-400 mb-2">
                     No love notes yet...
                 </h3>
-                <p className="text-gray-400">
+                <p className="text-gray-500">
                     Write your first note and let it float to your loved one!
                 </p>
             </motion.div>
         );
     }
 
-    // Separate notes into own and partner's
     const ownNotes = notes.filter(n => n.isOwn);
     const partnerNotes = notes.filter(n => !n.isOwn);
 
     return (
         <div className="space-y-8">
-            {/* Partner's notes */}
             {partnerNotes.length > 0 && (
                 <div>
-                    <h3 className="font-handwritten text-xl text-love-pink-500 mb-4 flex items-center gap-2">
+                    <h3 className="font-handwritten text-xl text-pink-400 mb-4 flex items-center gap-2">
                         <span>💕</span> Notes for you
                     </h3>
                     <div className="flex flex-wrap gap-6 justify-center">
@@ -89,11 +86,10 @@ export const FloatingNotes: React.FC<FloatingNotesProps> = ({
                                         senderName={note.sender.displayName}
                                         isOwn={false}
                                         isPublished={note.isPublished}
-                                        createdAt={new Date(note.createdAt)}
-                                        publishTime={new Date(note.publishTime)}
-                                        expiryTime={note.expiryTime ? new Date(note.expiryTime) : undefined}
-                                        timeUntilPublish={note.timeUntilPublish}
+                                        hasVoice={note.hasVoice}
+                                        voiceDuration={note.voiceDuration}
                                         timeUntilExpiry={note.timeUntilExpiry}
+                                        onPlayVoice={note.voiceMessage && onPlayVoice ? () => onPlayVoice(note.voiceMessage!) : undefined}
                                         colorIndex={index + 1}
                                     />
                                 </motion.div>
@@ -103,10 +99,9 @@ export const FloatingNotes: React.FC<FloatingNotesProps> = ({
                 </div>
             )}
 
-            {/* Own notes */}
             {ownNotes.length > 0 && (
                 <div>
-                    <h3 className="font-handwritten text-xl text-love-purple-500 mb-4 flex items-center gap-2">
+                    <h3 className="font-handwritten text-xl text-purple-400 mb-4 flex items-center gap-2">
                         <span>✨</span> Your notes
                     </h3>
                     <div className="flex flex-wrap gap-6 justify-center">
@@ -125,12 +120,12 @@ export const FloatingNotes: React.FC<FloatingNotesProps> = ({
                                         senderName="You"
                                         isOwn={true}
                                         isPublished={note.isPublished}
-                                        createdAt={new Date(note.createdAt)}
-                                        publishTime={new Date(note.publishTime)}
-                                        expiryTime={note.expiryTime ? new Date(note.expiryTime) : undefined}
+                                        hasVoice={note.hasVoice}
+                                        voiceDuration={note.voiceDuration}
                                         timeUntilPublish={note.timeUntilPublish}
                                         timeUntilExpiry={note.timeUntilExpiry}
-                                        onPublish={isLoading ? undefined : () => onPublish(note.id)}
+                                        onPublish={() => onPublish(note.id)}
+                                        onPlayVoice={note.voiceMessage && onPlayVoice ? () => onPlayVoice(note.voiceMessage!) : undefined}
                                         colorIndex={index}
                                     />
                                 </motion.div>
