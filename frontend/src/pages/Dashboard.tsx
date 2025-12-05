@@ -36,9 +36,6 @@ const Dashboard: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'notes' | 'diary'>('notes');
     const [showPartnerProfile, setShowPartnerProfile] = useState(false);
 
-    // Simple state for presence to avoid type errors
-    const [partnerPresence] = useState<string>('offline');
-
     // Toasts
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
@@ -212,29 +209,24 @@ const Dashboard: React.FC = () => {
                     <h1 className="font-logo text-3xl text-gradient cursor-pointer">
                         Kunji Kurups
                     </h1>
+                    {room && (
+                        <div className="glass-card px-4 py-2">
+                            <p className="text-xs text-gray-600">Room Code</p>
+                            <p className="text-lg font-bold text-pink-700 tracking-wider">{room.roomCode}</p>
+                        </div>
+                    )}
                 </div>
 
                 <div className="flex items-center gap-6">
-                    {/* Partner Badge */}
+                    {/* Partner Badge - Text Only */}
                     <div
-                        className="glass-card px-4 py-2 flex items-center gap-3 cursor-pointer hover:bg-pink-50 transition-colors"
+                        className="glass-card px-4 py-2 cursor-pointer hover:bg-pink-50 transition-colors"
                         onClick={() => setShowPartnerProfile(true)}
                     >
-                        <div className="relative">
-                            <img
-                                src={partner?.profilePicture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${partner?.username || 'partner'}`}
-                                alt="Partner"
-                                className="w-10 h-10 rounded-full border-2 border-pink-400"
-                            />
-                            <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${partnerPresence === 'online' ? 'bg-green-500' : 'bg-gray-400'
-                                }`} />
-                        </div>
-                        <div className="hidden md:block">
-                            <p className="text-sm font-bold text-pink-700">{partnerName}</p>
-                            <p className="text-xs text-gray-500">
-                                {partner ? (partnerPresence === 'online' ? 'Online' : 'Away') : 'Waiting...'}
-                            </p>
-                        </div>
+                        <p className="text-sm font-bold text-pink-700">{partnerName}</p>
+                        <p className="text-xs text-gray-500">
+                            {partner ? 'Connected' : 'Waiting...'}
+                        </p>
                     </div>
 
                     <button
