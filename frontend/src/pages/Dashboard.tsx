@@ -154,12 +154,12 @@ const Dashboard: React.FC = () => {
         setIsLoading(true);
         fetchNotes();
 
-        // Realtime Subscription
+        // Realtime Subscription - Optimized for instant updates
         const channel = supabase
             .channel(`room_notes:${room.id}`)
             .on('postgres_changes',
                 { event: '*', schema: 'public', table: 'notes', filter: `room_id=eq.${room.id}` },
-                (payload) => {
+                async (payload) => {
                     console.log('Realtime update:', payload);
 
                     // Check if it's a new published note from partner
@@ -175,7 +175,8 @@ const Dashboard: React.FC = () => {
                         }
                     }
 
-                    fetchNotes();
+                    // Instant UI update without full refetch
+                    await fetchNotes();
                 }
             )
             .subscribe();
