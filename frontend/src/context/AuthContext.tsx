@@ -81,11 +81,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 .eq('id', userId)
                 .single();
 
-            if (error) throw error;
             if (data) {
-                // Map snake_case to camelCase if needed, but schema uses snake_case in Plan?
-                // Plan said users: id, username, display_name...
-                // Interface uses camelCase. Mapping needed.
+                // User exists
                 const userData: User = {
                     id: data.id,
                     username: data.username,
@@ -95,9 +92,43 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     roomId: data.room_id
                 };
                 setUser(userData);
+            } else {
+                // User does not exist (e.g. first time Google Login)
+                // Auto-create profile
+                const { data: { user: authUser } } = await supabase.auth.getUser();
+
+                if (authUser) {
+                    const email = authUser.email || '';
+                    const username = email.split('@')[0] + Math.floor(Math.random() * 1000); // Generate unique-ish username
+                    const displayName = authUser.user_metadata.full_name || authUser.user_metadata.name || 'New User';
+                    const avatar = authUser.user_metadata.avatar_url || authUser.user_metadata.picture || '';
+
+                    const { error: insertError } = await supabase
+                        .from('users')
+                        .insert({
+                            id: userId,
+                            username: username,
+                            display_name: displayName,
+                            profile_picture: avatar,
+                            bio: ''
+                        });
+
+                    if (insertError) {
+                        console.error('Error creating profile:', insertError);
+                    } else {
+                        // Profile created, set local state
+                        setUser({
+                            id: userId,
+                            username: username,
+                            displayName: displayName,
+                            profilePicture: avatar,
+                            bio: ''
+                        });
+                    }
+                }
             }
         } catch (error) {
-            console.error('Error fetching user:', error);
+            console.error('Error in fetchUserProfile:', error);
         } finally {
             setIsLoading(false);
         }
