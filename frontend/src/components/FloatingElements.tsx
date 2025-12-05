@@ -1,83 +1,70 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useMemo } from 'react';
 
 interface FloatingElementsProps {
     heartCount?: number;
     butterflyCount?: number;
 }
 
-export const FloatingElements: React.FC<FloatingElementsProps> = ({
-    heartCount = 10,
-    butterflyCount = 5
-}) => {
-    const hearts = Array.from({ length: heartCount }, (_, i) => ({
-        id: `heart-${i}`,
-        size: 16 + Math.random() * 20,
-        left: Math.random() * 100,
-        delay: Math.random() * 20,
-        duration: 15 + Math.random() * 10,
-    }));
+// Generate stable random values once
+const generateStableElements = (count: number, seed: number) => {
+    const elements = [];
+    for (let i = 0; i < count; i++) {
+        // Use deterministic pseudo-random based on index
+        const hash = (seed * (i + 1) * 9301 + 49297) % 233280;
+        elements.push({
+            id: `${seed}-${i}`,
+            left: (hash % 100),
+            size: 16 + (hash % 20),
+            delay: (hash % 200) / 10,
+            duration: 12 + (hash % 10),
+            animationType: hash % 3, // 0, 1, or 2 for different animations
+        });
+    }
+    return elements;
+};
 
-    const butterflies = Array.from({ length: butterflyCount }, (_, i) => ({
-        id: `butterfly-${i}`,
-        left: 10 + Math.random() * 80,
-        top: 10 + Math.random() * 80,
-        delay: Math.random() * 5,
-    }));
+export const FloatingElements: React.FC<FloatingElementsProps> = ({
+    heartCount = 12,
+    butterflyCount = 6
+}) => {
+    // UseMemo with empty deps ensures these don't regenerate on rerender
+    const hearts = useMemo(() => generateStableElements(heartCount, 1234), [heartCount]);
+    const butterflies = useMemo(() => generateStableElements(butterflyCount, 5678), [butterflyCount]);
 
     return (
         <>
-            {/* Floating Hearts */}
-            <div className="floating-hearts">
+            {/* Floating Hearts - CSS animations (won't reset on state change) */}
+            <div className="floating-hearts" aria-hidden="true">
                 {hearts.map((heart) => (
-                    <motion.div
+                    <div
                         key={heart.id}
-                        className="heart"
+                        className={`heart heart-animation-${heart.animationType}`}
                         style={{
                             left: `${heart.left}%`,
                             fontSize: `${heart.size}px`,
-                        }}
-                        initial={{ y: '100vh', rotate: 0, opacity: 0 }}
-                        animate={{
-                            y: '-100px',
-                            rotate: 720,
-                            opacity: [0, 0.15, 0.15, 0],
-                        }}
-                        transition={{
-                            duration: heart.duration,
-                            delay: heart.delay,
-                            repeat: Infinity,
-                            ease: 'linear',
+                            animationDelay: `${heart.delay}s`,
+                            animationDuration: `${heart.duration}s`,
                         }}
                     >
                         ❤️
-                    </motion.div>
+                    </div>
                 ))}
             </div>
 
-            {/* Butterflies */}
+            {/* Butterflies - CSS animations */}
             {butterflies.map((butterfly) => (
-                <motion.div
+                <div
                     key={butterfly.id}
-                    className="butterfly"
+                    className={`butterfly butterfly-animation-${butterfly.animationType}`}
                     style={{
                         left: `${butterfly.left}%`,
-                        top: `${butterfly.top}%`,
+                        top: `${10 + (butterfly.animationType * 25)}%`,
+                        animationDelay: `${butterfly.delay}s`,
                     }}
-                    animate={{
-                        y: [0, -30, -10, -40, 0],
-                        x: [0, 20, -15, 10, 0],
-                        rotate: [0, 10, -5, 8, 0],
-                    }}
-                    transition={{
-                        duration: 8,
-                        delay: butterfly.delay,
-                        repeat: Infinity,
-                        ease: 'easeInOut',
-                    }}
+                    aria-hidden="true"
                 >
                     🦋
-                </motion.div>
+                </div>
             ))}
         </>
     );

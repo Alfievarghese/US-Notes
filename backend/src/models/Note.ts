@@ -12,6 +12,7 @@ export interface INote extends Document {
     isDeleted: boolean;
     voiceMessage?: string;
     voiceDuration?: number;
+    imageData?: string;
 }
 
 const NoteSchema = new Schema<INote>({
@@ -57,6 +58,10 @@ const NoteSchema = new Schema<INote>({
     voiceDuration: {
         type: Number,
         default: 0
+    },
+    imageData: {
+        type: String,
+        default: ''
     }
 });
 

@@ -6,15 +6,19 @@ import { notesApi, diaryApi } from '../api/client';
 import { NoteCreator } from '../components/NoteCreator';
 import { StickyNote } from '../components/StickyNote';
 import { FloatingElements } from '../components/FloatingElements';
+import { ProfilePopup } from '../components/ProfilePopup';
+import { useToastState } from '../components/Toast';
 
 type TabType = 'notes' | 'diary' | 'settings';
 
 interface Note {
     id: string;
     content: string;
-    sender: { _id: string; displayName: string; profilePicture?: string };
+    sender: { _id: string; displayName: string; profilePicture?: string; bio?: string };
     isPublished: boolean;
     hasVoice: boolean;
+    hasImage?: boolean;
+    imageData?: string;
     voiceMessage?: string;
     voiceDuration?: number;
     timeUntilPublish: number | null;
@@ -39,11 +43,13 @@ export const Dashboard: React.FC = () => {
     const [isCreating, setIsCreating] = useState(false);
     const [diaryContent, setDiaryContent] = useState('');
     const [editingDiary, setEditingDiary] = useState<string | null>(null);
-    const [profileForm, setProfileForm] = useState({ displayName: '', bio: '' });
+    const [profileForm, setProfileForm] = useState({ displayName: '', bio: '', profilePicture: '' });
+    const [selectedProfile, setSelectedProfile] = useState<{ displayName: string; profilePicture?: string; bio?: string } | null>(null);
 
     const audioRef = useRef<HTMLAudioElement>(null);
     const { user, partner, room, logout, leaveRoom, updateProfile, refreshRoomInfo } = useAuth();
     const navigate = useNavigate();
+    const { showToast, ToastContainer } = useToastState();
 
     useEffect(() => {
         if (!user) navigate('/login');
@@ -74,22 +80,30 @@ export const Dashboard: React.FC = () => {
         if (room) {
             fetchNotes();
             fetchDiaries();
-            const interval = setInterval(() => { fetchNotes(); fetchDiaries(); }, 30000);
+            // Poll every 10 seconds for real-time updates (like WhatsApp)
+            const interval = setInterval(() => { fetchNotes(); fetchDiaries(); }, 10000);
             return () => clearInterval(interval);
         }
     }, [room, fetchNotes, fetchDiaries]);
 
     useEffect(() => {
         if (user) {
-            setProfileForm({ displayName: user.displayName, bio: user.bio || '' });
+            setProfileForm({
+                displayName: user.displayName,
+                bio: user.bio || '',
+                profilePicture: user.profilePicture || ''
+            });
         }
     }, [user]);
 
-    const handleCreateNote = async (content: string, voiceMessage?: string, voiceDuration?: number) => {
+    const handleCreateNote = async (content: string, voiceMessage?: string, voiceDuration?: number, imageData?: string) => {
         setIsCreating(true);
         try {
-            await notesApi.create(content, voiceMessage, voiceDuration);
+            await notesApi.create(content, voiceMessage, voiceDuration, imageData);
             await fetchNotes();
+            showToast('Note sent with love! 💕', 'success');
+        } catch (error) {
+            showToast('Failed to send note', 'error');
         } finally {
             setIsCreating(false);
         }
@@ -99,6 +113,7 @@ export const Dashboard: React.FC = () => {
         try {
             await notesApi.publish(noteId);
             await fetchNotes();
+            showToast('Note published! ❤️', 'success');
         } catch (error) {
             console.error('Failed to publish:', error);
         }
@@ -110,6 +125,7 @@ export const Dashboard: React.FC = () => {
             await diaryApi.create(diaryContent);
             setDiaryContent('');
             await fetchDiaries();
+            showToast('Diary entry added! 📖', 'success');
         } catch (error) {
             console.error('Failed to create diary:', error);
         }
@@ -120,17 +136,33 @@ export const Dashboard: React.FC = () => {
             await diaryApi.update(id, content);
             setEditingDiary(null);
             await fetchDiaries();
+            showToast('Diary updated! ✨', 'success');
         } catch (error) {
             console.error('Failed to update diary:', error);
+        }
+    };
+
+    const handleProfilePictureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('Image must be under 2MB', 'error');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                setProfileForm(p => ({ ...p, profilePicture: event.target?.result as string }));
+            };
+            reader.readAsDataURL(file);
         }
     };
 
     const handleUpdateProfile = async () => {
         try {
             await updateProfile(profileForm);
-            alert('Profile updated! ❤️');
+            showToast('Profile updated! ❤️', 'success');
         } catch (error) {
-            console.error('Failed to update profile:', error);
+            showToast('Failed to update profile', 'error');
         }
     };
 
@@ -148,8 +180,16 @@ export const Dashboard: React.FC = () => {
 
     return (
         <div className="min-h-screen relative pb-20">
-            <FloatingElements heartCount={8} butterflyCount={4} />
+            <FloatingElements heartCount={10} butterflyCount={5} />
             <audio ref={audioRef} className="hidden" />
+            <ToastContainer />
+
+            {/* Profile Popup */}
+            <ProfilePopup
+                isOpen={!!selectedProfile}
+                onClose={() => setSelectedProfile(null)}
+                profile={selectedProfile}
+            />
 
             {/* Header */}
             <header className="navbar sticky top-0 z-50 px-4 py-3">
@@ -159,36 +199,43 @@ export const Dashboard: React.FC = () => {
                             ❤️
                         </motion.span>
                         <div>
-                            <h1 className="font-romantic text-2xl text-gradient">Kunji Kurups</h1>
-                            <p className="text-xs text-gray-400">{room.roomName}</p>
+                            <h1 className="font-romantic text-2xl text-gradient">US</h1>
+                            <p className="text-xs text-gray-500">{room.roomName}</p>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-4">
                         {partner ? (
-                            <div className="text-right hidden sm:block">
-                                <p className="text-xs text-gray-400">With</p>
-                                <p className="font-handwritten text-pink-400">{partner.displayName} ❤️</p>
-                            </div>
+                            <button
+                                onClick={() => setSelectedProfile({
+                                    displayName: partner.displayName,
+                                    profilePicture: partner.profilePicture,
+                                    bio: partner.bio
+                                })}
+                                className="text-right hidden sm:block hover:opacity-80 transition-opacity cursor-pointer"
+                            >
+                                <p className="text-xs text-gray-500">With</p>
+                                <p className="font-handwritten text-pink-600">{partner.displayName} ❤️</p>
+                            </button>
                         ) : (
                             <div className="text-right hidden sm:block">
-                                <p className="text-xs text-gray-400">Room Code</p>
+                                <p className="text-xs text-gray-500">Room Code</p>
                                 <p className="room-code text-sm">{room.roomCode}</p>
                             </div>
                         )}
-                        <button onClick={logout} className="text-gray-400 hover:text-white transition-colors">Logout</button>
+                        <button onClick={logout} className="text-gray-500 hover:text-pink-600 transition-colors font-medium">Logout</button>
                     </div>
                 </div>
             </header>
 
             {/* Tabs */}
             <div className="sticky top-16 z-40 bg-transparent py-4">
-                <div className="max-w-md mx-auto flex bg-white/5 rounded-xl p-1 backdrop-blur-sm">
+                <div className="max-w-md mx-auto flex bg-white/50 rounded-2xl p-1.5 backdrop-blur-sm shadow-sm">
                     {(['notes', 'diary', 'settings'] as TabType[]).map((t) => (
                         <button
                             key={t}
                             onClick={() => setTab(t)}
-                            className={`flex-1 py-2 rounded-lg font-handwritten text-lg transition-all capitalize ${tab === t ? 'tab-active' : 'text-gray-400 hover:text-white'
+                            className={`flex-1 py-2.5 rounded-xl font-semibold text-base transition-all capitalize ${tab === t ? 'tab-active' : 'text-gray-500 hover:text-pink-600'
                                 }`}
                         >
                             {t === 'notes' && '💌 '}{t === 'diary' && '📖 '}{t === 'settings' && '⚙️ '}{t}
@@ -208,7 +255,7 @@ export const Dashboard: React.FC = () => {
                             <div className="mt-10 space-y-8">
                                 {partnerNotes.length > 0 && (
                                     <div>
-                                        <h3 className="font-handwritten text-xl text-pink-400 mb-4">❤️ Notes for you</h3>
+                                        <h3 className="font-semibold text-xl text-pink-600 mb-4">❤️ Notes for you</h3>
                                         <div className="flex flex-wrap gap-6 justify-center">
                                             {partnerNotes.map((note, i) => (
                                                 <StickyNote
@@ -219,9 +266,16 @@ export const Dashboard: React.FC = () => {
                                                     isOwn={false}
                                                     isPublished={note.isPublished}
                                                     hasVoice={note.hasVoice}
+                                                    hasImage={note.hasImage}
+                                                    imageData={note.imageData}
                                                     voiceDuration={note.voiceDuration}
                                                     timeUntilExpiry={note.timeUntilExpiry}
                                                     onPlayVoice={() => note.voiceMessage && playVoice(note.voiceMessage)}
+                                                    onProfileClick={() => setSelectedProfile({
+                                                        displayName: note.sender.displayName,
+                                                        profilePicture: note.sender.profilePicture,
+                                                        bio: note.sender.bio
+                                                    })}
                                                     colorIndex={i + 1}
                                                 />
                                             ))}
@@ -231,7 +285,7 @@ export const Dashboard: React.FC = () => {
 
                                 {ownNotes.length > 0 && (
                                     <div>
-                                        <h3 className="font-handwritten text-xl text-purple-400 mb-4">✨ Your notes</h3>
+                                        <h3 className="font-semibold text-xl text-purple-600 mb-4">✨ Your notes</h3>
                                         <div className="flex flex-wrap gap-6 justify-center">
                                             {ownNotes.map((note, i) => (
                                                 <StickyNote
@@ -241,6 +295,8 @@ export const Dashboard: React.FC = () => {
                                                     isOwn={true}
                                                     isPublished={note.isPublished}
                                                     hasVoice={note.hasVoice}
+                                                    hasImage={note.hasImage}
+                                                    imageData={note.imageData}
                                                     voiceDuration={note.voiceDuration}
                                                     timeUntilPublish={note.timeUntilPublish}
                                                     timeUntilExpiry={note.timeUntilExpiry}
@@ -256,7 +312,7 @@ export const Dashboard: React.FC = () => {
                                 {notes.length === 0 && !isLoading && (
                                     <div className="text-center py-16">
                                         <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 3, repeat: Infinity }} className="text-7xl mb-6">💌</motion.div>
-                                        <h3 className="font-handwritten text-2xl text-gray-400">No love notes yet...</h3>
+                                        <h3 className="font-semibold text-2xl text-gray-600">No love notes yet...</h3>
                                         <p className="text-gray-500 mt-2">Write your first note and let it float to your loved one!</p>
                                     </div>
                                 )}
@@ -268,7 +324,7 @@ export const Dashboard: React.FC = () => {
                     {tab === 'diary' && (
                         <motion.div key="diary" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
                             <div className="glass-card max-w-lg mx-auto p-6 mb-8">
-                                <h3 className="font-handwritten text-xl text-gradient mb-4">📖 Write in our diary</h3>
+                                <h3 className="font-semibold text-xl text-gradient mb-4">📖 Write in our diary</h3>
                                 <textarea
                                     value={diaryContent}
                                     onChange={(e) => setDiaryContent(e.target.value)}
@@ -285,12 +341,12 @@ export const Dashboard: React.FC = () => {
                                 {diaries.map((diary) => (
                                     <motion.div key={diary.id} className="glass-card p-4" layout>
                                         <div className="flex items-center gap-3 mb-3">
-                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-red-500 flex items-center justify-center text-white">
+                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-white font-bold">
                                                 {diary.author.displayName.charAt(0)}
                                             </div>
                                             <div>
-                                                <p className="font-handwritten text-lg">{diary.author.displayName}</p>
-                                                <p className="text-xs text-gray-400">{new Date(diary.createdAt).toLocaleDateString()}</p>
+                                                <p className="font-semibold text-lg text-gray-700">{diary.author.displayName}</p>
+                                                <p className="text-xs text-gray-500">{new Date(diary.createdAt).toLocaleDateString()}</p>
                                             </div>
                                         </div>
 
@@ -311,9 +367,9 @@ export const Dashboard: React.FC = () => {
                                             </div>
                                         ) : (
                                             <div>
-                                                <p className="text-gray-200 whitespace-pre-wrap">{diary.content}</p>
+                                                <p className="text-gray-700 whitespace-pre-wrap">{diary.content}</p>
                                                 {diary.isOwn && (
-                                                    <button onClick={() => setEditingDiary(diary.id)} className="text-sm text-gray-400 hover:text-white mt-2">Edit</button>
+                                                    <button onClick={() => setEditingDiary(diary.id)} className="text-sm text-pink-500 hover:text-pink-600 mt-2 font-medium">Edit</button>
                                                 )}
                                             </div>
                                         )}
@@ -327,10 +383,45 @@ export const Dashboard: React.FC = () => {
                     {tab === 'settings' && (
                         <motion.div key="settings" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="max-w-lg mx-auto">
                             <div className="glass-card p-6 mb-6">
-                                <h3 className="font-handwritten text-xl text-gradient mb-4">👤 Profile</h3>
+                                <h3 className="font-semibold text-xl text-gradient mb-6">👤 Profile</h3>
+
+                                {/* Profile Picture */}
+                                <div className="flex flex-col items-center mb-6">
+                                    <div className="relative">
+                                        {profileForm.profilePicture ? (
+                                            <img
+                                                src={profileForm.profilePicture}
+                                                alt="Profile"
+                                                className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
+                                                style={{ boxShadow: '0 0 0 4px #f472b6' }}
+                                            />
+                                        ) : (
+                                            <div
+                                                className="w-24 h-24 rounded-full flex items-center justify-center text-4xl text-white font-bold"
+                                                style={{
+                                                    background: 'linear-gradient(135deg, #ec4899, #f43f5e)',
+                                                    boxShadow: '0 0 0 4px #f472b6'
+                                                }}
+                                            >
+                                                {user?.displayName?.charAt(0) || '?'}
+                                            </div>
+                                        )}
+                                        <label className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center text-white cursor-pointer shadow-lg hover:scale-110 transition-transform">
+                                            <span className="text-lg">📷</span>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleProfilePictureUpload}
+                                                className="hidden"
+                                            />
+                                        </label>
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-3">Tap 📷 to change photo</p>
+                                </div>
+
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-gray-300 mb-2">Display Name</label>
+                                        <label className="block text-gray-600 mb-2 font-medium">Display Name</label>
                                         <input
                                             type="text"
                                             value={profileForm.displayName}
@@ -339,25 +430,26 @@ export const Dashboard: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-gray-300 mb-2">Bio</label>
+                                        <label className="block text-gray-600 mb-2 font-medium">Bio</label>
                                         <textarea
                                             value={profileForm.bio}
                                             onChange={(e) => setProfileForm(p => ({ ...p, bio: e.target.value }))}
-                                            className="love-input min-h-[80px] resize-none"
-                                            placeholder="Tell your partner something..."
+                                            className="love-input min-h-[100px] resize-none"
+                                            placeholder="Tell your partner something sweet... 💕"
                                             maxLength={500}
                                         />
+                                        <p className="text-xs text-gray-400 mt-1 text-right">{profileForm.bio.length}/500</p>
                                     </div>
-                                    <button onClick={handleUpdateProfile} className="love-button w-full">Update Profile ❤️</button>
+                                    <button onClick={handleUpdateProfile} className="love-button w-full">Save Profile ❤️</button>
                                 </div>
                             </div>
 
                             <div className="glass-card p-6 mb-6">
-                                <h3 className="font-handwritten text-xl text-gradient mb-4">🏠 Room Info</h3>
-                                <div className="space-y-3 text-gray-300">
-                                    <p><span className="text-gray-400">Room Name:</span> {room.roomName}</p>
-                                    <p><span className="text-gray-400">Room Code:</span> <span className="room-code text-xl">{room.roomCode}</span></p>
-                                    <p><span className="text-gray-400">Partner:</span> {partner ? partner.displayName : 'Waiting for partner...'}</p>
+                                <h3 className="font-semibold text-xl text-gradient mb-4">🏠 Room Info</h3>
+                                <div className="space-y-3 text-gray-600">
+                                    <p><span className="text-gray-500">Room Name:</span> <span className="font-medium">{room.roomName}</span></p>
+                                    <p><span className="text-gray-500">Room Code:</span> <span className="room-code">{room.roomCode}</span></p>
+                                    <p><span className="text-gray-500">Partner:</span> <span className="font-medium">{partner ? partner.displayName : 'Waiting for partner...'}</span></p>
                                 </div>
                                 <button onClick={leaveRoom} className="love-button-secondary w-full mt-4">Leave Room</button>
                             </div>
@@ -369,7 +461,7 @@ export const Dashboard: React.FC = () => {
             {/* Refresh FAB */}
             <motion.button
                 onClick={() => { fetchNotes(); fetchDiaries(); refreshRoomInfo(); }}
-                className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-r from-pink-500 to-red-500 text-white text-2xl shadow-lg z-50 flex items-center justify-center"
+                className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white text-2xl shadow-lg z-50 flex items-center justify-center"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
             >

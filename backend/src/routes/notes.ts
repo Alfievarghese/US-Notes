@@ -23,13 +23,13 @@ const requireRoom = async (req: AuthRequest, res: Response, next: Function) => {
 // Create a new note (text or voice)
 router.post('/', authMiddleware, requireRoom, async (req: AuthRequest, res: Response): Promise<void> => {
     try {
-        const { content, voiceMessage, voiceDuration } = req.body;
+        const { content, voiceMessage, voiceDuration, imageData } = req.body;
         const userId = req.userId!;
         const roomId = req.user!.roomId!;
 
-        // Must have either content or voice message
-        if ((!content || content.trim().length === 0) && !voiceMessage) {
-            res.status(400).json({ error: 'Note content or voice message is required' });
+        // Must have either content, voice message, or image
+        if ((!content || content.trim().length === 0) && !voiceMessage && !imageData) {
+            res.status(400).json({ error: 'Note content, voice message, or image is required' });
             return;
         }
 
@@ -50,7 +50,8 @@ router.post('/', authMiddleware, requireRoom, async (req: AuthRequest, res: Resp
             isPublished: false,
             isDeleted: false,
             voiceMessage: voiceMessage || '',
-            voiceDuration: voiceDuration || 0
+            voiceDuration: voiceDuration || 0,
+            imageData: imageData || ''
         });
 
         await note.save();
@@ -152,7 +153,7 @@ router.get('/', authMiddleware, requireRoom, async (req: AuthRequest, res: Respo
                 }
             ]
         })
-            .populate('senderId', 'displayName username profilePicture')
+            .populate('senderId', 'displayName username profilePicture bio')
             .sort({ createdAt: -1 });
 
         const formattedNotes = notes.map(note => ({
@@ -167,6 +168,8 @@ router.get('/', authMiddleware, requireRoom, async (req: AuthRequest, res: Respo
             hasVoice: !!note.voiceMessage,
             voiceMessage: note.voiceMessage,
             voiceDuration: note.voiceDuration,
+            hasImage: !!note.imageData,
+            imageData: note.imageData,
             timeUntilPublish: !note.isPublished
                 ? Math.max(0, note.publishTime.getTime() - now.getTime())
                 : null,

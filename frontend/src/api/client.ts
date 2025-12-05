@@ -86,8 +86,8 @@ export const roomApi = {
 
 // Notes API
 export const notesApi = {
-    create: async (content: string, voiceMessage?: string, voiceDuration?: number) => {
-        const response = await api.post('/notes', { content, voiceMessage, voiceDuration });
+    create: async (content: string, voiceMessage?: string, voiceDuration?: number, imageData?: string) => {
+        const response = await api.post('/notes', { content, voiceMessage, voiceDuration, imageData });
         return response.data;
     },
     publish: async (noteId: string) => {

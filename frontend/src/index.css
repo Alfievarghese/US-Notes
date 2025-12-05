@@ -132,15 +132,19 @@ body {
   pointer-events: none;
   z-index: 1;
   filter: drop-shadow(2px 4px 6px rgba(219, 39, 119, 0.3));
-  animation: butterflyDance 8s ease-in-out infinite;
 }
 
-.butterfly:nth-child(odd) {
-  animation: butterflyDance 10s ease-in-out infinite reverse;
+/* Class-based animation variants for butterflies */
+.butterfly-animation-0 {
+  animation: butterflyDance 10s ease-in-out infinite;
 }
 
-.butterfly:nth-child(3n) {
-  animation: butterflySpiral 12s ease-in-out infinite;
+.butterfly-animation-1 {
+  animation: butterflySpiral 14s ease-in-out infinite;
+}
+
+.butterfly-animation-2 {
+  animation: butterflyFigure8 12s ease-in-out infinite;
 }
 
 @keyframes butterflyDance {
@@ -195,6 +199,42 @@ body {
   }
 }
 
+@keyframes butterflyFigure8 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  12.5% {
+    transform: translate(25px, -15px) rotate(5deg);
+  }
+
+  25% {
+    transform: translate(40px, 0) rotate(10deg);
+  }
+
+  37.5% {
+    transform: translate(25px, 15px) rotate(5deg);
+  }
+
+  50% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  62.5% {
+    transform: translate(-25px, -15px) rotate(-5deg);
+  }
+
+  75% {
+    transform: translate(-40px, 0) rotate(-10deg);
+  }
+
+  87.5% {
+    transform: translate(-25px, 15px) rotate(-5deg);
+  }
+}
+
 /* ============================================
    FLOATING HEARTS - Romantic rising effect
    ============================================ */
@@ -212,16 +252,20 @@ body {
 .heart {
   position: absolute;
   opacity: 0;
-  animation: heartRise 12s ease-in-out infinite;
   filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.4));
 }
 
-.heart:nth-child(odd) {
+/* Class-based animation variants for hearts */
+.heart-animation-0 {
+  animation: heartRise 12s ease-in-out infinite;
+}
+
+.heart-animation-1 {
   animation: heartRiseSway 14s ease-in-out infinite;
 }
 
-.heart:nth-child(3n) {
-  animation: heartRiseSpin 10s ease-in-out infinite;
+.heart-animation-2 {
+  animation: heartRiseSpin 16s ease-in-out infinite;
 }
 
 @keyframes heartRise {

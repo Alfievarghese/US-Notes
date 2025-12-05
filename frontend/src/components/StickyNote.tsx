@@ -5,14 +5,18 @@ interface StickyNoteProps {
     content: string;
     senderName: string;
     senderPicture?: string;
+    senderBio?: string;
     isOwn: boolean;
     isPublished: boolean;
     hasVoice?: boolean;
+    hasImage?: boolean;
+    imageData?: string;
     voiceDuration?: number;
     timeUntilPublish?: number | null;
     timeUntilExpiry?: number | null;
     onPublish?: () => void;
     onPlayVoice?: () => void;
+    onProfileClick?: () => void;
     colorIndex?: number;
 }
 
@@ -34,11 +38,14 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
     isOwn,
     isPublished,
     hasVoice,
+    hasImage,
+    imageData,
     voiceDuration,
     timeUntilPublish,
     timeUntilExpiry,
     onPublish,
     onPlayVoice,
+    onProfileClick,
     colorIndex = 0,
 }) => {
     const rotation = useMemo(() => (Math.random() - 0.5) * 4, []);
@@ -66,13 +73,20 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
             {/* Header */}
             <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                    {senderPicture ? (
-                        <img src={senderPicture} alt="" className="w-8 h-8 rounded-full object-cover" />
-                    ) : (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-red-400 flex items-center justify-center text-white text-sm">
-                            {senderName.charAt(0)}
-                        </div>
-                    )}
+                    {/* Clickable profile picture */}
+                    <button
+                        onClick={onProfileClick}
+                        className={`flex-shrink-0 ${!isOwn && onProfileClick ? 'cursor-pointer hover:ring-2 hover:ring-pink-400 transition-all' : 'cursor-default'}`}
+                        disabled={isOwn || !onProfileClick}
+                    >
+                        {senderPicture ? (
+                            <img src={senderPicture} alt="" className="w-8 h-8 rounded-full object-cover" />
+                        ) : (
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-red-400 flex items-center justify-center text-white text-sm">
+                                {senderName.charAt(0)}
+                            </div>
+                        )}
+                    </button>
                     <span className="text-sm font-semibold text-gray-600">
                         {isOwn ? 'You' : senderName}
                     </span>
@@ -89,6 +103,20 @@ export const StickyNote: React.FC<StickyNoteProps> = ({
                     </span>
                 )}
             </div>
+
+            {/* Image attachment */}
+            {hasImage && imageData && (
+                <motion.div
+                    className="mb-3 rounded-lg overflow-hidden cursor-pointer"
+                    whileHover={{ scale: 1.02 }}
+                >
+                    <img
+                        src={imageData}
+                        alt="Note attachment"
+                        className="w-full h-auto max-h-40 object-cover rounded-lg"
+                    />
+                </motion.div>
+            )}
 
             {/* Content */}
             {content && (

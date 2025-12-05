@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface NoteCreatorProps {
-    onSubmit: (content: string, voiceMessage?: string, voiceDuration?: number) => Promise<void>;
+    onSubmit: (content: string, voiceMessage?: string, voiceDuration?: number, imageData?: string) => Promise<void>;
     isLoading: boolean;
 }
 
@@ -12,6 +12,7 @@ export const NoteCreator: React.FC<NoteCreatorProps> = ({ onSubmit, isLoading })
     const [isRecording, setIsRecording] = useState(false);
     const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
     const [audioDuration, setAudioDuration] = useState(0);
+    const [imageData, setImageData] = useState<string | null>(null);
     const [showSuccess, setShowSuccess] = useState(false);
 
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -60,8 +61,28 @@ export const NoteCreator: React.FC<NoteCreatorProps> = ({ onSubmit, isLoading })
         setAudioDuration(0);
     };
 
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            // Check file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Image must be under 2MB');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                setImageData(event.target?.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const clearImage = () => {
+        setImageData(null);
+    };
+
     const handleSubmit = async () => {
-        if (!content.trim() && !audioBlob) return;
+        if (!content.trim() && !audioBlob && !imageData) return;
 
         try {
             let voiceBase64: string | undefined;
@@ -74,10 +95,11 @@ export const NoteCreator: React.FC<NoteCreatorProps> = ({ onSubmit, isLoading })
                 });
             }
 
-            await onSubmit(content, voiceBase64, audioDuration);
+            await onSubmit(content, voiceBase64, audioDuration, imageData || undefined);
             setContent('');
             setAudioBlob(null);
             setAudioDuration(0);
+            setImageData(null);
             setShowSuccess(true);
             setTimeout(() => {
                 setShowSuccess(false);
@@ -106,8 +128,8 @@ export const NoteCreator: React.FC<NoteCreatorProps> = ({ onSubmit, isLoading })
                         >
                             💌
                         </motion.div>
-                        <h3 className="font-handwritten text-2xl text-gradient">Note sent with love!</h3>
-                        <p className="text-gray-400 mt-2">It will float to your partner soon...</p>
+                        <h3 className="font-semibold text-2xl text-gradient">Note sent with love!</h3>
+                        <p className="text-gray-500 mt-2">It will float to your partner soon...</p>
                     </motion.div>
                 ) : (
                     <motion.div key="form" layout>
@@ -118,7 +140,7 @@ export const NoteCreator: React.FC<NoteCreatorProps> = ({ onSubmit, isLoading })
                                 whileHover={{ scale: 1.02 }}
                             >
                                 <span className="text-5xl group-hover:scale-110 inline-block transition-transform">✨</span>
-                                <h3 className="font-handwritten text-2xl text-gradient mt-3">Write a love note...</h3>
+                                <h3 className="font-semibold text-2xl text-gradient mt-3">Write a love note...</h3>
                             </motion.button>
                         ) : (
                             <motion.div
@@ -141,26 +163,56 @@ export const NoteCreator: React.FC<NoteCreatorProps> = ({ onSubmit, isLoading })
                                     </span>
                                 </div>
 
-                                {/* Voice recorder */}
-                                <div className="voice-recorder p-4">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-lg">🎤 Voice Message</span>
+                                {/* Image preview */}
+                                {imageData && (
+                                    <motion.div
+                                        className="relative rounded-xl overflow-hidden"
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                    >
+                                        <img src={imageData} alt="Attachment" className="w-full h-40 object-cover rounded-xl" />
+                                        <button
+                                            onClick={clearImage}
+                                            className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center shadow-lg hover:bg-red-600 transition-colors"
+                                        >
+                                            ✕
+                                        </button>
+                                    </motion.div>
+                                )}
 
+                                {/* Attachment buttons */}
+                                <div className="flex gap-3">
+                                    {/* Image upload */}
+                                    <label className="flex-1 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border-2 border-dashed border-purple-200 cursor-pointer hover:border-purple-400 transition-colors text-center">
+                                        <span className="text-2xl">📷</span>
+                                        <p className="text-sm text-gray-600 mt-1">Add Photo</p>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleImageUpload}
+                                            className="hidden"
+                                        />
+                                    </label>
+
+                                    {/* Voice recorder */}
+                                    <div className="flex-1 p-4 voice-recorder text-center">
+                                        <span className="text-2xl">🎤</span>
+                                        <p className="text-sm text-gray-600 mt-1">Voice Note</p>
                                         {!audioBlob && !isRecording && (
                                             <motion.button
                                                 onClick={startRecording}
-                                                className="px-4 py-2 bg-gradient-to-r from-pink-500 to-red-500 text-white rounded-full text-sm"
+                                                className="mt-2 px-3 py-1 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full text-xs"
                                                 whileHover={{ scale: 1.05 }}
                                                 whileTap={{ scale: 0.95 }}
                                             >
-                                                Start Recording
+                                                Record
                                             </motion.button>
                                         )}
 
                                         {isRecording && (
                                             <motion.button
                                                 onClick={stopRecording}
-                                                className="px-4 py-2 bg-red-600 text-white rounded-full text-sm recording-pulse flex items-center gap-2"
+                                                className="mt-2 px-3 py-1 bg-red-600 text-white rounded-full text-xs recording-pulse flex items-center gap-1 mx-auto"
                                                 whileTap={{ scale: 0.95 }}
                                             >
                                                 <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
@@ -169,9 +221,9 @@ export const NoteCreator: React.FC<NoteCreatorProps> = ({ onSubmit, isLoading })
                                         )}
 
                                         {audioBlob && (
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-sm text-gray-300">{Math.round(audioDuration)}s</span>
-                                                <button onClick={clearRecording} className="text-red-400 hover:text-red-300">✕</button>
+                                            <div className="mt-2 flex items-center justify-center gap-2">
+                                                <span className="text-xs text-gray-500">{Math.round(audioDuration)}s</span>
+                                                <button onClick={clearRecording} className="text-red-400 hover:text-red-500 text-xs">✕</button>
                                             </div>
                                         )}
                                     </div>
@@ -180,7 +232,7 @@ export const NoteCreator: React.FC<NoteCreatorProps> = ({ onSubmit, isLoading })
                                 {/* Actions */}
                                 <div className="flex gap-3">
                                     <button
-                                        onClick={() => { setIsExpanded(false); setContent(''); clearRecording(); }}
+                                        onClick={() => { setIsExpanded(false); setContent(''); clearRecording(); clearImage(); }}
                                         className="love-button-secondary flex-1"
                                         disabled={isLoading}
                                     >
@@ -189,7 +241,7 @@ export const NoteCreator: React.FC<NoteCreatorProps> = ({ onSubmit, isLoading })
                                     <button
                                         onClick={handleSubmit}
                                         className="love-button flex-1"
-                                        disabled={(!content.trim() && !audioBlob) || isLoading}
+                                        disabled={(!content.trim() && !audioBlob && !imageData) || isLoading}
                                     >
                                         {isLoading ? '💫' : 'Send ❤️'}
                                     </button>
