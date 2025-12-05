@@ -64,9 +64,9 @@ export const NoteCreator: React.FC<NoteCreatorProps> = ({ onSubmit, isLoading })
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            // Check file size (max 2MB)
-            if (file.size > 2 * 1024 * 1024) {
-                alert('Image must be under 2MB');
+            // Check file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Image must be under 5MB');
                 return;
             }
             const reader = new FileReader();
