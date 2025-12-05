@@ -14,8 +14,8 @@ interface Note {
     hasVoice?: boolean;
     voiceMessage?: string;
     voiceDuration?: number;
-    timeUntilPublish: number | null;
-    timeUntilExpiry: number | null;
+    timeUntilPublish?: string; // Changed to string
+    daysUntilExpiry?: number; // Changed from timeUntilExpiry
 }
 
 interface FloatingNotesProps {
@@ -88,7 +88,7 @@ export const FloatingNotes: React.FC<FloatingNotesProps> = ({
                                         isPublished={note.isPublished}
                                         hasVoice={note.hasVoice}
                                         voiceDuration={note.voiceDuration}
-                                        timeUntilExpiry={note.timeUntilExpiry}
+                                        daysUntilExpiry={note.daysUntilExpiry}
                                         onPlayVoice={note.voiceMessage && onPlayVoice ? () => onPlayVoice(note.voiceMessage!) : undefined}
                                         colorIndex={index + 1}
                                     />
@@ -123,7 +123,7 @@ export const FloatingNotes: React.FC<FloatingNotesProps> = ({
                                         hasVoice={note.hasVoice}
                                         voiceDuration={note.voiceDuration}
                                         timeUntilPublish={note.timeUntilPublish}
-                                        timeUntilExpiry={note.timeUntilExpiry}
+                                        daysUntilExpiry={note.daysUntilExpiry}
                                         onPublish={() => onPublish(note.id)}
                                         onPlayVoice={note.voiceMessage && onPlayVoice ? () => onPlayVoice(note.voiceMessage!) : undefined}
                                         colorIndex={index}

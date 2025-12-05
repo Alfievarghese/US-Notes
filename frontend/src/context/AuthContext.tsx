@@ -75,7 +75,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const fetchUserProfile = async (userId: string) => {
         try {
-            const { data, error } = await supabase
+            const { data } = await supabase
                 .from('users')
                 .select('*')
                 .eq('id', userId)
